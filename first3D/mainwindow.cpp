@@ -9,13 +9,12 @@ MainWindow::MainWindow(QWidget *parent) :
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
-    dist = 0.3;
+    dist = 0.5;
     angle = 1.0;
     up = QVector3D(0, 0, 50);
     eye = QVector3D(300, 0, 0);
     scene = QImage(600, 400, QImage::Format_RGB888);
     scene.fill(QColor(255, 255, 255).rgba());
-    //source = QFile("D:\_Учеба\Универ\_Gp\teapotCGA.bpt");
 
     fillCoordinates();
 
@@ -75,28 +74,40 @@ void MainWindow::mouseMoveEvent(QMouseEvent *e)
         angle -= 1;
     }
     QMatrix4x4 matr_rot = QMatrix4x4();
+    matr_rot.rotate(angle, test.first());
     drawTeapot();
-
-    for(int i = 0; i < test.size(); i++) {
-        scene.setPixel(project3Dto2Dscreen(test.at(i)), QColor(255, 0, 0).rgba());
-    }
 /*
-    for(int i = 0; i < bezier_surface.size() - 3; i += 4) {
-        drawLine(checkXYRange(translate(matr_rot.mapVector(bezier_surface.at(i)))), checkXYRange(translate(matr_rot.mapVector(bezier_surface.at(i + 1)))), QColor(255, 0, 0).rgba());
-        drawLine(checkXYRange(translate(matr_rot.mapVector(bezier_surface.at(i + 1)))), checkXYRange(translate(matr_rot.mapVector(bezier_surface.at(i + 2)))), QColor(255, 0, 0).rgba());
-        drawLine(checkXYRange(translate(matr_rot.mapVector(bezier_surface.at(i + 2)))), checkXYRange(translate(matr_rot.mapVector(bezier_surface.at(i + 3)))), QColor(255, 0, 0).rgba());
-        drawLine(checkXYRange(translate(matr_rot.mapVector(bezier_surface.at(i + 3)))), checkXYRange(translate(matr_rot.mapVector(bezier_surface.at(i + 1)))), QColor(255, 0, 0).rgba());
+    for(int i = 0; i < test.size(); i++) {
+        scene.setPixel(project3Dto2Dscreen(matr_rot.mapVector(test.at(i))), QColor(255, 0, 0).rgba());
+    }
 */
+    /*for(int i = 0; i < bezier_surface.size() - 3; i += 4) {
+        drawLine(checkXYRange(project3Dto2Dscreen(matr_rot.mapVector(bezier_surface.at(i)))), checkXYRange(project3Dto2Dscreen(matr_rot.mapVector(bezier_surface.at(i + 1)))), QColor(255, 0, 0).rgba());
+        drawLine(checkXYRange(project3Dto2Dscreen(matr_rot.mapVector(bezier_surface.at(i + 1)))), checkXYRange(project3Dto2Dscreen(matr_rot.mapVector(bezier_surface.at(i + 2)))), QColor(255, 0, 0).rgba());
+        drawLine(checkXYRange(project3Dto2Dscreen(matr_rot.mapVector(bezier_surface.at(i + 2)))), checkXYRange(project3Dto2Dscreen(matr_rot.mapVector(bezier_surface.at(i + 3)))), QColor(255, 0, 0).rgba());
+        drawLine(checkXYRange(project3Dto2Dscreen(matr_rot.mapVector(bezier_surface.at(i + 3)))), checkXYRange(project3Dto2Dscreen(matr_rot.mapVector(bezier_surface.at(i)))), QColor(255, 0, 0).rgba());
+
        /* for(int j = i + 1; j < i + 16; j++) {
             drawLine(checkXYRange(translate(point_set.at(i))), checkXYRange(translate(point_set.at(j))), QColor(255, 0, 0).rgba());
-        }*/
-    //}
+        }* /
+    } // */
+/*
+    for(int i = 0; i < bezier_surface.size(); i++) {
+        scene.setPixel(project3Dto2Dscreen(matr_rot.mapVector(bezier_surface.at(i))), QColor(255, 0, 0).rgba());
+    }*/
+    for(int i = 0; i < 32; i++) {
+            drawLine(project3Dto2Dscreen(matr_rot.mapVector(bezier_surface.at(i * 4))), project3Dto2Dscreen(matr_rot.mapVector(bezier_surface.at(i * 4 + 1))), QColor(255, 0, 0).rgba());
+            drawLine(project3Dto2Dscreen(matr_rot.mapVector(bezier_surface.at(i * 4 + 1))), project3Dto2Dscreen(matr_rot.mapVector(bezier_surface.at(i * 4 + 3))), QColor(255, 0, 0).rgba());
+            drawLine(project3Dto2Dscreen(matr_rot.mapVector(bezier_surface.at(i * 4 + 2))), project3Dto2Dscreen(matr_rot.mapVector(bezier_surface.at(i * 4 + 3))), QColor(255, 0, 0).rgba());
+            drawLine(project3Dto2Dscreen(matr_rot.mapVector(bezier_surface.at(i * 4 + 2))), project3Dto2Dscreen(matr_rot.mapVector(bezier_surface.at(i * 4))), QColor(255, 0, 0).rgba());
+
+    }
 
     update();
 }
 
 
-QPoint MainWindow::translate(QVector3D x){
+QPoint MainWindow::translate(QVector3D x) {
     up.normalize();
     //eye.normalize();
     right = up.crossProduct(eye, up);
@@ -111,8 +122,7 @@ QPoint MainWindow::translate(QVector3D x){
     return QPoint(X + scene.width() / 2, -Y + scene.height() / 2);
 }
 
-void MainWindow::drawLine(QPoint pnt1, QPoint pnt2, QRgb clr)
-{
+void MainWindow::drawLine(QPoint pnt1, QPoint pnt2, QRgb clr) {
     int curr_x = pnt1.x(), curr_y = pnt1.y(), end_x = pnt2.x(), end_y = pnt2.y();
     if(curr_y == end_y) {
         drawHLine(pnt1, pnt2);
@@ -144,21 +154,18 @@ void MainWindow::drawLine(QPoint pnt1, QPoint pnt2, QRgb clr)
     }
 }
 
-void MainWindow::drawHLine(QPoint pnt1, QPoint pnt2)
-{
+void MainWindow::drawHLine(QPoint pnt1, QPoint pnt2) {
     for(int i = pnt1.x(); i < pnt2.x(); i ++){
         scene.setPixel(checkXYRange(QPoint(i, pnt1.y())), QColor(0, 0, 0).rgba());
     }
 }
-void MainWindow::drawVLine(QPoint pnt1, QPoint pnt2)
-{
+void MainWindow::drawVLine(QPoint pnt1, QPoint pnt2) {
     for(int i = pnt1.y(); i < pnt2.y(); i ++){
         scene.setPixel(checkXYRange(QPoint(pnt1.x(), i)), QColor(0, 0, 0).rgba());
     }
 }
 
-QPoint MainWindow::checkXYRange(QPoint pnt)
-{
+QPoint MainWindow::checkXYRange(QPoint pnt) {
     int pnt_x = pnt.x(), pnt_y = pnt.y();
     if(0 > pnt.x()) {
         pnt_x = 0;
@@ -175,11 +182,11 @@ QPoint MainWindow::checkXYRange(QPoint pnt)
     return QPoint(pnt_x, pnt_y);
 }
 
-void MainWindow::clearScene(){
+void MainWindow::clearScene() {
     scene.fill(QColor(255, 255, 255).rgba());
 }
 
-QPoint MainWindow::project3Dto2Dscreen(QVector3D point3D){
+QPoint MainWindow::project3Dto2Dscreen(QVector3D point3D) {
     QVector3D eye1 = eye.normalized();
     //eye.normalize();
     up.normalize();
@@ -198,8 +205,6 @@ void MainWindow::fillCoordinates() {
         std::cerr << "file was not open";
     }
          source >> patch_number;
-
-
          for(int i = 0; i < patch_number; i++) {
              source >> dimension1 >> dimension2;
              for(int j = 0; j < (dimension1 + 1) * (dimension2 + 1); j++) {
@@ -208,16 +213,19 @@ void MainWindow::fillCoordinates() {
                  point_set.append(QVector3D(x * 30, y * 30, z * 30));
              }
          }
+         if(source) {
+               source.close();
+         }
 }
 
 void MainWindow::drawTeapot() {
-    for(int ptch = 0; ptch < 3/*patch_number*/; ptch++)
-    for(double u = 0.1; u < 1.0; u += 0.4) {
-        for(double v = 0.1; v < 1.0; v += 0.4) {
+    for(int ptch = 0; ptch < 32/*patch_number*/; ptch++)
+    for(double u = 0.1; u < 1.0; u += 0.8) {
+        for(double v = 0.1; v < 1.0; v += 0.8) {
             QVector3D surf_point(0, 0, 0);
-            for(int i = 0; i < dimension1; i++) {
-                for(int j = 0; j < dimension2; j++) {
-                    surf_point += bernstein(dimension1, i, u) * bernstein(dimension2, j, v) * point_set.at(ptch * (dimension1 + 1) * (dimension2) + i * dimension1 + j);
+            for(int i = 0; i <= dimension1; i++) {
+                for(int j = 0; j <= dimension2; j++) {
+                    surf_point += bernstein(dimension1, i, u) * bernstein(dimension2, j, v) * point_set.at(ptch * (dimension1 + 1) * (dimension2 + 1) + j * (dimension1 + 1) + i);
                 }
             }
             bezier_surface.append(surf_point);
