@@ -45,7 +45,8 @@ private:
     /*QVector3D apex1, apex2, apex3;
     QVector3D apex4, apex11, apex21;
     QVector3D apex31, apex41;*/
-    float angle;
+    float alpha;
+    float beta;
     QVector<QVector3D> point_set;
     QVector<QVector3D> bezier_surface;
     QVector<QVector3D> test;
