@@ -1,0 +1,51 @@
+#ifndef MAINWINDOW_H
+#define MAINWINDOW_H
+
+#include <QMainWindow>
+#include <QVector3D>
+#include <QMouseEvent>
+#include <fstream>
+#include <iostream>
+
+namespace Ui {
+class MainWindow;
+}
+
+class MainWindow : public QMainWindow
+{
+    Q_OBJECT
+    
+public:
+    explicit MainWindow(QWidget *parent = 0);
+    ~MainWindow();
+    void paintEvent(QPaintEvent *);
+    void mousePressEvent(QMouseEvent *);
+    void mouseMoveEvent(QMouseEvent *);
+    QPoint translate(QVector3D x);
+    void drawLine(QPoint, QPoint, QRgb);
+    void clearScene();
+    void drawHLine(QPoint, QPoint);
+    void drawVLine(QPoint, QPoint);
+    QPoint checkXYRange(QPoint);
+    QPoint project3Dto2Dscreen(QVector3D);
+    void fillCoordinates();
+    
+private:
+    Ui::MainWindow *ui;
+    QVector3D eye;
+    QVector3D right;
+    QVector3D up;
+    QImage scene;
+    qreal dist;
+    QPoint start_point;
+    QPoint end_point;
+    QVector3D apex1, apex2, apex3;
+    QVector3D apex4, apex11, apex21;
+    QVector3D apex31, apex41;
+    float angle;
+    QVector<QVector3D> point_set;
+    //QFile source;
+    //std::ifstream source;
+};
+
+#endif // MAINWINDOW_H
