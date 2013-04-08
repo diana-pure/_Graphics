@@ -22,11 +22,12 @@ public:
     void setPixelSafe(QPoint, QRgb);
     void setSegmentNum(int);
     void setDistance(int);
+    void drawAxis();
 
     void drawLine(QPoint, QPoint, QRgb);
     void clearScene();
-    void drawHLine(QPoint, QPoint);
-    void drawVLine(QPoint, QPoint);
+    void drawHLine(QPoint, QPoint, QRgb);
+    void drawVLine(QPoint, QPoint, QRgb);
     QPoint project3Dto2Dscreen(QVector3D);
     void fillCoordinates();
     void drawTeapot();
@@ -61,6 +62,7 @@ private:
     int patch_number;
     int NUM_SEGMENTS;
     QRgb teapot_color;
+    bool draw_axis_on;
     
 };
 

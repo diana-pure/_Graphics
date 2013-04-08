@@ -11,7 +11,8 @@ Calculator::Calculator(QObject *parent) :
 {
     dist = 150;
     NUM_SEGMENTS = 0;
-    teapot_color = QColor(199, 21, 133).rgba();
+    draw_axis_on = true;//false;
+    teapot_color = QColor(222, 49, 99).rgba();//QColor(199, 21, 133).rgba();
     alpha = 1.0;
     beta = 1.0;
     up = QVector3D(0, 0, 50);
@@ -24,16 +25,19 @@ Calculator::Calculator(QObject *parent) :
 
 void Calculator::run()
 {
-    teapot_color = QColor(222, 49, 99).rgba();
+    //teapot_color = QColor(222, 49, 99).rgba();
     clearScene();
+    if(draw_axis_on) {
+        drawAxis();
+    }
 
     int delta_x = -(end_point.x() - start_point.x());
     int delta_y = -(end_point.y() - start_point.y());
- /*   alpha = 10 * qAsin(delta_x * qPow(300 * 300 - delta_x * delta_x / 4, 0.5) / (300 * 300));
+    alpha = 10 * qAsin(delta_x * qPow(300 * 300 - delta_x * delta_x / 4, 0.5) / (300 * 300));
     beta = 10 * qAsin(delta_y * qPow(300 * 300 - delta_y * delta_y / 4, 0.5) / (300 * 300));
-   */ alpha = delta_x;// / 10;
+ /*   alpha = delta_x;// / 10;
     beta = delta_y;// / 10;
-    QMatrix4x4 matr_rot = QMatrix4x4();
+   */ QMatrix4x4 matr_rot = QMatrix4x4();
     matr_rot.rotate(alpha, up);
     eye = matr_rot.mapVector(eye);
     right = up.crossProduct(up, eye);
@@ -150,6 +154,9 @@ return result;
 
 void Calculator::fillCoordinates() {
     std::ifstream source("D:\\TMP\\teapotCGA.bpt");
+    //std::ifstream source("D:\\TMP\\teacup.bpt");
+    //std::ifstream source("D:\\TMP\\teapottall.bpt");
+    //std::ifstream source("D:\\TMP\\teaspoon.bpt");
     if(!source) {
         std::cerr << "file was not open";
     }
@@ -184,11 +191,11 @@ QPoint Calculator::project3Dto2Dscreen(QVector3D point3D) {
 void Calculator::drawLine(QPoint pnt1, QPoint pnt2, QRgb clr) {
     int curr_x = pnt1.x(), curr_y = pnt1.y(), end_x = pnt2.x(), end_y = pnt2.y();
     if(curr_y == end_y) {
-        drawHLine(pnt1, pnt2);
+        drawHLine(pnt1, pnt2, clr);
         return;
     }
     if(curr_x == end_x) {
-        drawVLine(pnt1, pnt2);
+        drawVLine(pnt1, pnt2, clr);
         return;
     }
     int deltaX = qAbs(end_x - curr_x);
@@ -213,14 +220,14 @@ void Calculator::drawLine(QPoint pnt1, QPoint pnt2, QRgb clr) {
     }
 }
 
-void Calculator::drawHLine(QPoint pnt1, QPoint pnt2) {
+void Calculator::drawHLine(QPoint pnt1, QPoint pnt2, QRgb clr) {
     for(int i = pnt1.x(); i < pnt2.x(); i ++){
-        setPixelSafe(QPoint(i, pnt1.y()), teapot_color);
+        setPixelSafe(QPoint(i, pnt1.y()), clr);
     }
 }
-void Calculator::drawVLine(QPoint pnt1, QPoint pnt2) {
+void Calculator::drawVLine(QPoint pnt1, QPoint pnt2, QRgb clr) {
     for(int i = pnt1.y(); i < pnt2.y(); i ++){
-        setPixelSafe(QPoint(pnt1.x(), i), teapot_color);
+        setPixelSafe(QPoint(pnt1.x(), i), clr);
     }
 }
 
@@ -247,4 +254,15 @@ void Calculator::setDistance(int dst) {
     QMutexLocker locker(&mutex);
     eye *= dst / eye.length();
     //eye = dst * eye.normalized();
+}
+
+void Calculator::drawAxis() {
+    QVector3D center(0, 0, 0);
+    QVector3D x_axis(50, 0, 0);
+    QVector3D y_axis(0, 50, 0);
+    QVector3D z_axis(0, 0, 50);
+
+    drawLine(project3Dto2Dscreen(center), project3Dto2Dscreen(x_axis), QColor(255, 0, 0).rgba());
+    drawLine(project3Dto2Dscreen(center), project3Dto2Dscreen(y_axis), QColor(0, 255, 0).rgba());
+    drawLine(project3Dto2Dscreen(center), project3Dto2Dscreen(z_axis), QColor(0, 0, 255).rgba());
 }
