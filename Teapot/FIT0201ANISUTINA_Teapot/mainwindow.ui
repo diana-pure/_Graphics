@@ -11,12 +11,15 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>MainWindow</string>
+   <string>FIT0201ANISUTINA_Teapot</string>
   </property>
   <widget class="QWidget" name="centralWidget">
    <layout class="QGridLayout" name="gridLayout">
     <item row="1" column="1">
      <widget class="QSlider" name="segmentNumerSlider">
+      <property name="maximum">
+       <number>32</number>
+      </property>
       <property name="orientation">
        <enum>Qt::Horizontal</enum>
       </property>
@@ -40,6 +43,18 @@
     </item>
     <item row="1" column="0">
      <widget class="QSlider" name="distanceSlider">
+      <property name="minimum">
+       <number>200</number>
+      </property>
+      <property name="maximum">
+       <number>1000</number>
+      </property>
+      <property name="singleStep">
+       <number>10</number>
+      </property>
+      <property name="sliderPosition">
+       <number>300</number>
+      </property>
       <property name="orientation">
        <enum>Qt::Horizontal</enum>
       </property>
@@ -68,5 +83,38 @@
   </customwidget>
  </customwidgets>
  <resources/>
- <connections/>
+ <connections>
+  <connection>
+   <sender>segmentNumerSlider</sender>
+   <signal>sliderMoved(int)</signal>
+   <receiver>segmentNumberLbl</receiver>
+   <slot>setNum(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>316</x>
+     <y>361</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>443</x>
+     <y>380</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>distanceSlider</sender>
+   <signal>sliderMoved(int)</signal>
+   <receiver>distanceLbl</receiver>
+   <slot>setNum(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>171</x>
+     <y>366</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>173</x>
+     <y>387</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
 </ui>

@@ -20,6 +20,8 @@ public:
     void moveCameraPosition(double);
     void setPixelSafe(int, int, QRgb);
     void setPixelSafe(QPoint, QRgb);
+    void setSegmentNum(int);
+    void setDistance(int);
 
     void drawLine(QPoint, QPoint, QRgb);
     void clearScene();
@@ -57,6 +59,8 @@ private:
     int dimension1;
     int dimension2;
     int patch_number;
+    int NUM_SEGMENTS;
+    QRgb teapot_color;
     
 };
 

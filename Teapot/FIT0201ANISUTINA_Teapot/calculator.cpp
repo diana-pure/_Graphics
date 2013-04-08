@@ -9,11 +9,13 @@
 Calculator::Calculator(QObject *parent) :
     QThread(parent)
 {
-    dist = 0.5;
+    dist = 150;
+    NUM_SEGMENTS = 0;
+    teapot_color = QColor(199, 21, 133).rgba();
     alpha = 1.0;
     beta = 1.0;
     up = QVector3D(0, 0, 50);
-    eye = QVector3D(300, 0, 0);
+    eye = QVector3D(100, 0, 0);
     scene_size = QSize(600, 400);
     scene = QImage(scene_size, QImage::Format_RGB888);
     scene.fill(QColor(255, 255, 255).rgba());
@@ -22,12 +24,15 @@ Calculator::Calculator(QObject *parent) :
 
 void Calculator::run()
 {
+    teapot_color = QColor(222, 49, 99).rgba();
     clearScene();
 
     int delta_x = -(end_point.x() - start_point.x());
     int delta_y = -(end_point.y() - start_point.y());
-    alpha = 10 * qAsin(delta_x * qPow(300 * 300 - delta_x * delta_x / 4, 0.5) / (300 * 300));
+ /*   alpha = 10 * qAsin(delta_x * qPow(300 * 300 - delta_x * delta_x / 4, 0.5) / (300 * 300));
     beta = 10 * qAsin(delta_y * qPow(300 * 300 - delta_y * delta_y / 4, 0.5) / (300 * 300));
+   */ alpha = delta_x;// / 10;
+    beta = delta_y;// / 10;
     QMatrix4x4 matr_rot = QMatrix4x4();
     matr_rot.rotate(alpha, up);
     eye = matr_rot.mapVector(eye);
@@ -36,24 +41,7 @@ void Calculator::run()
     eye = matr_rot.mapVector(eye);
     up = matr_rot.mapVector(up);
     drawTeapot();
-/*
-    for(int i = 0; i < bezier_surface.size(); i++) {
-        setPixelSafe(project3Dto2Dscreen(/*matr_rot.mapVector(* /bezier_surface.at(i))/*)* /, QColor(255, 0, 0).rgba());
-    }
-    for(int i = 0; i < 32; i++) {
-            drawLine(project3Dto2Dscreen(matr_rot.mapVector(bezier_surface.at(i * 9))), project3Dto2Dscreen(matr_rot.mapVector(bezier_surface.at(i * 9 + 1))), QColor(255, 0, 0).rgba());
-            drawLine(project3Dto2Dscreen(matr_rot.mapVector(bezier_surface.at(i * 9 + 1))), project3Dto2Dscreen(matr_rot.mapVector(bezier_surface.at(i * 9 + 2))), QColor(255, 0, 0).rgba());
-            drawLine(project3Dto2Dscreen(matr_rot.mapVector(bezier_surface.at(i * 9 + 3))), project3Dto2Dscreen(matr_rot.mapVector(bezier_surface.at(i * 9 + 4))), QColor(255, 0, 0).rgba());
-            drawLine(project3Dto2Dscreen(matr_rot.mapVector(bezier_surface.at(i * 9 + 4))), project3Dto2Dscreen(matr_rot.mapVector(bezier_surface.at(i * 9 + 5))), QColor(255, 0, 0).rgba());
-            drawLine(project3Dto2Dscreen(matr_rot.mapVector(bezier_surface.at(i * 9 + 6))), project3Dto2Dscreen(matr_rot.mapVector(bezier_surface.at(i * 9 + 7))), QColor(255, 0, 0).rgba());
-            drawLine(project3Dto2Dscreen(matr_rot.mapVector(bezier_surface.at(i * 9 + 7))), project3Dto2Dscreen(matr_rot.mapVector(bezier_surface.at(i * 9 + 8))), QColor(255, 0, 0).rgba());
-            drawLine(project3Dto2Dscreen(matr_rot.mapVector(bezier_surface.at(i * 9))), project3Dto2Dscreen(matr_rot.mapVector(bezier_surface.at(i * 9 + 3))), QColor(255, 0, 0).rgba());
-            drawLine(project3Dto2Dscreen(matr_rot.mapVector(bezier_surface.at(i * 9 + 3))), project3Dto2Dscreen(matr_rot.mapVector(bezier_surface.at(i * 9 + 6))), QColor(255, 0, 0).rgba());
-            drawLine(project3Dto2Dscreen(matr_rot.mapVector(bezier_surface.at(i * 9 + 1))), project3Dto2Dscreen(matr_rot.mapVector(bezier_surface.at(i * 9 + 4))), QColor(255, 0, 0).rgba());
-            drawLine(project3Dto2Dscreen(matr_rot.mapVector(bezier_surface.at(i * 9 + 4))), project3Dto2Dscreen(matr_rot.mapVector(bezier_surface.at(i * 9 + 7))), QColor(255, 0, 0).rgba());
-            drawLine(project3Dto2Dscreen(matr_rot.mapVector(bezier_surface.at(i * 9 + 2))), project3Dto2Dscreen(matr_rot.mapVector(bezier_surface.at(i * 9 + 5))), QColor(255, 0, 0).rgba());
-            drawLine(project3Dto2Dscreen(matr_rot.mapVector(bezier_surface.at(i * 9 + 5))), project3Dto2Dscreen(matr_rot.mapVector(bezier_surface.at(i * 9 + 8))), QColor(255, 0, 0).rgba());
-    }*/
+    end_point = start_point;
     emit readyProjection(scene);
 }
 
@@ -65,20 +53,20 @@ void Calculator::projectModel()
     }
 }
 void Calculator::setStartPoint(QPoint pnt) {
-    //QMutexLocker locker(&mutex);
+    QMutexLocker locker(&mutex);
     start_point = pnt;
 }
 
 void Calculator::setEndPoint(QPoint pnt) {
-    //QMutexLocker locker(&mutex);
+    QMutexLocker locker(&mutex);
     end_point = pnt;
 }
 void Calculator::setSceneSize(QSize sz) {
-    //QMutexLocker locker(&mutex);
+    QMutexLocker locker(&mutex);
     scene_size = sz;
 }
 void Calculator::moveCameraPosition(double dst) {
-    //QMutexLocker locker(&mutex);
+    QMutexLocker locker(&mutex);
     eye += eye * dst;
 }
 void Calculator::grabScene(QImage scn) {
@@ -92,10 +80,12 @@ void Calculator::clearScene() {
     scene.fill(QColor(255, 255, 255).rgba());
 }
 void Calculator::drawTeapot() {
-    for(int ptch = 0; ptch < 32/*patch_number*/; ptch++) {
+    double STEP_discr = 1.0 / static_cast<double>(NUM_SEGMENTS + 1);
+    double STEP_contin = 0.001;
+    for(int ptch = 0; ptch < patch_number; ptch++) {
         //vertical lines
-        for(double u = 0.0; u <= 1.0; u += 0.5) {
-            // get control points for bezier cuve
+        for(double u = 0.0; u <= 1.0; u += STEP_discr) {
+            // get control points for bezier curve
             //draw bezier curve
             bzr_crv_ctrl_pnts.clear();
             for(int j = 0; j <= dimension2; j++) {
@@ -109,18 +99,18 @@ void Calculator::drawTeapot() {
                 bzr_crv_ctrl_pnts.append(curve_point);
                 curve_point = QVector3D(0, 0, 0);
             }
-            for(double v = 0.0; v <= 1.0; v += 0.001) {
+            for(double v = 0.0; v <= 1.0; v += STEP_contin) {
                 QVector3D surf_point(0, 0, 0);
                     for(int j = 0; j <= dimension2; j++) {
                         surf_point += bernstein(dimension2, j, v) * bzr_crv_ctrl_pnts.at(j);
                     }
-                    setPixelSafe(project3Dto2Dscreen(surf_point), QColor(200, 0, 0).rgba());
+                    setPixelSafe(project3Dto2Dscreen(surf_point), teapot_color);
                     surf_point = QVector3D(0, 0, 0);
             }
         }
         //horisontal lines
-        for(double v = 0.0; v <= 1.0; v += 0.5) {
-            // get control points for bezier cuve
+        for(double v = 0.0; v <= 1.0; v += STEP_discr) {
+            // get control points for bezier curve
             //draw bezier curve
             bzr_crv_ctrl_pnts.clear();
             for(int i = 0; i <= dimension1; i++) {
@@ -134,12 +124,12 @@ void Calculator::drawTeapot() {
                 bzr_crv_ctrl_pnts.append(curve_point);
                 curve_point = QVector3D(0, 0, 0);
             }
-            for(double u = 0.0; u <= 1.0; u += 0.001) {
+            for(double u = 0.0; u <= 1.0; u += STEP_contin) {
                 QVector3D surf_point(0, 0, 0);
                     for(int i = 0; i <= dimension1; i++) {
                         surf_point += bernstein(dimension1, i, u) * bzr_crv_ctrl_pnts.at(i);
                     }
-                    setPixelSafe(project3Dto2Dscreen(surf_point), QColor(200, 0, 0).rgba());
+                    setPixelSafe(project3Dto2Dscreen(surf_point), teapot_color);
                     surf_point = QVector3D(0, 0, 0);
             }
         }
@@ -182,7 +172,8 @@ QPoint Calculator::project3Dto2Dscreen(QVector3D point3D) {
     //eye.normalize();
     up.normalize();
     right = up.crossProduct(up, eye1);
-    QVector3D center_projected = eye * dist;
+    QVector3D center_projected = eye * (dist / eye.length());
+    //QVector3D center_projected = dist * eye.normalized();
     double t_star = - (eye.x() * (eye.x() - center_projected.x()) + eye.y() * (eye.y() - center_projected.y()) + eye.z() * (eye.z() - center_projected.z())) /
             (eye.x() * (point3D.x() - center_projected.x()) + eye.y() * (point3D.y() - center_projected.y()) + eye.z() * (point3D.z() - center_projected.z()) );
     QVector3D point3DonPlane3D = QVector3D(eye.x() + t_star * point3D.x(), eye.y() + t_star * point3D.y(), eye.z() + t_star * point3D.z());
@@ -224,12 +215,12 @@ void Calculator::drawLine(QPoint pnt1, QPoint pnt2, QRgb clr) {
 
 void Calculator::drawHLine(QPoint pnt1, QPoint pnt2) {
     for(int i = pnt1.x(); i < pnt2.x(); i ++){
-        setPixelSafe(QPoint(i, pnt1.y()), QColor(0, 0, 0).rgba());
+        setPixelSafe(QPoint(i, pnt1.y()), teapot_color);
     }
 }
 void Calculator::drawVLine(QPoint pnt1, QPoint pnt2) {
     for(int i = pnt1.y(); i < pnt2.y(); i ++){
-        setPixelSafe(QPoint(pnt1.x(), i), QColor(0, 0, 0).rgba());
+        setPixelSafe(QPoint(pnt1.x(), i), teapot_color);
     }
 }
 
@@ -246,4 +237,14 @@ void Calculator::setPixelSafe(int x_coord, int y_coord, QRgb color) {
 }
 void Calculator::setPixelSafe(QPoint pnt, QRgb color) {
     setPixelSafe(pnt.x(), pnt.y(), color);
+}
+void Calculator::setSegmentNum(int num) {
+    QMutexLocker locker(&mutex);
+    NUM_SEGMENTS = num;
+}
+
+void Calculator::setDistance(int dst) {
+    QMutexLocker locker(&mutex);
+    eye *= dst / eye.length();
+    //eye = dst * eye.normalized();
 }

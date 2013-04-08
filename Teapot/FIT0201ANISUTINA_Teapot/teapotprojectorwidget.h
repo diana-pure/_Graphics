@@ -27,6 +27,8 @@ public:
 
 public slots:
     void redrawProjection(QImage);
+    void changeSegmentNumber(int);
+    void changeDistance(int);
     
 private:
     Ui::TeapotProjectorWidget *ui;

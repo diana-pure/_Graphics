@@ -49,3 +49,13 @@ void TeapotProjectorWidget::setSceneSize(QSize sz) {
     calculator.setSceneSize(sz);
     calculator.projectModel();
 }
+
+void TeapotProjectorWidget::changeSegmentNumber(int num) {
+    calculator.setSegmentNum(num);
+    calculator.projectModel();
+}
+
+void TeapotProjectorWidget::changeDistance(int dst) {
+    calculator.setDistance(dst);
+    calculator.projectModel();
+}
