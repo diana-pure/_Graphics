@@ -17,12 +17,14 @@ public:
     void setStartPoint(QPoint);
     void setEndPoint(QPoint);
     void setSceneSize(QSize);
+    void moveCameraPosition(double);
+    void setPixelSafe(int, int, QRgb);
+    void setPixelSafe(QPoint, QRgb);
 
     void drawLine(QPoint, QPoint, QRgb);
     void clearScene();
     void drawHLine(QPoint, QPoint);
     void drawVLine(QPoint, QPoint);
-    QPoint checkXYRange(QPoint);
     QPoint project3Dto2Dscreen(QVector3D);
     void fillCoordinates();
     void drawTeapot();
@@ -51,6 +53,7 @@ private:
     QVector<QVector3D> point_set;
     QVector<QVector3D> bezier_surface;
     QVector<QVector3D> test;
+    QVector<QVector3D> bzr_crv_ctrl_pnts;
     int dimension1;
     int dimension2;
     int patch_number;

@@ -9,7 +9,6 @@
 Calculator::Calculator(QObject *parent) :
     QThread(parent)
 {
-//    projection = QImage(200, 200, QImage::Format_RGB888);
     dist = 0.5;
     alpha = 1.0;
     beta = 1.0;
@@ -37,9 +36,9 @@ void Calculator::run()
     eye = matr_rot.mapVector(eye);
     up = matr_rot.mapVector(up);
     drawTeapot();
-
+/*
     for(int i = 0; i < bezier_surface.size(); i++) {
-        scene.setPixel(project3Dto2Dscreen(/*matr_rot.mapVector(*/bezier_surface.at(i))/*)*/, QColor(255, 0, 0).rgba());
+        setPixelSafe(project3Dto2Dscreen(/*matr_rot.mapVector(* /bezier_surface.at(i))/*)* /, QColor(255, 0, 0).rgba());
     }
     for(int i = 0; i < 32; i++) {
             drawLine(project3Dto2Dscreen(matr_rot.mapVector(bezier_surface.at(i * 9))), project3Dto2Dscreen(matr_rot.mapVector(bezier_surface.at(i * 9 + 1))), QColor(255, 0, 0).rgba());
@@ -54,7 +53,7 @@ void Calculator::run()
             drawLine(project3Dto2Dscreen(matr_rot.mapVector(bezier_surface.at(i * 9 + 4))), project3Dto2Dscreen(matr_rot.mapVector(bezier_surface.at(i * 9 + 7))), QColor(255, 0, 0).rgba());
             drawLine(project3Dto2Dscreen(matr_rot.mapVector(bezier_surface.at(i * 9 + 2))), project3Dto2Dscreen(matr_rot.mapVector(bezier_surface.at(i * 9 + 5))), QColor(255, 0, 0).rgba());
             drawLine(project3Dto2Dscreen(matr_rot.mapVector(bezier_surface.at(i * 9 + 5))), project3Dto2Dscreen(matr_rot.mapVector(bezier_surface.at(i * 9 + 8))), QColor(255, 0, 0).rgba());
-    }
+    }*/
     emit readyProjection(scene);
 }
 
@@ -78,6 +77,10 @@ void Calculator::setSceneSize(QSize sz) {
     //QMutexLocker locker(&mutex);
     scene_size = sz;
 }
+void Calculator::moveCameraPosition(double dst) {
+    //QMutexLocker locker(&mutex);
+    eye += eye * dst;
+}
 void Calculator::grabScene(QImage scn) {
     // what about synchronization ?
     QMutexLocker locker(&mutex);
@@ -89,19 +92,56 @@ void Calculator::clearScene() {
     scene.fill(QColor(255, 255, 255).rgba());
 }
 void Calculator::drawTeapot() {
-    for(int ptch = 0; ptch < 32/*patch_number*/; ptch++)
-    for(double u = 0.0; u <= 1.0; u += 0.5) {
-        for(double v = 0.0; v <= 1.0; v += 0.5) {
-            QVector3D surf_point(0, 0, 0);
-            for(int i = 0; i <= dimension1; i++) {
-                for(int j = 0; j <= dimension2; j++) {
-                    surf_point += bernstein(dimension1, i, u) * bernstein(dimension2, j, v) * point_set.at(ptch * (dimension1 + 1) * (dimension2 + 1) + j * (dimension1 + 1) + i);
+    for(int ptch = 0; ptch < 32/*patch_number*/; ptch++) {
+        //vertical lines
+        for(double u = 0.0; u <= 1.0; u += 0.5) {
+            // get control points for bezier cuve
+            //draw bezier curve
+            bzr_crv_ctrl_pnts.clear();
+            for(int j = 0; j <= dimension2; j++) {
+                QVector3D curve_point(0, 0, 0);
+                for(int i = 0; i <= dimension1; i++) {
+                    if(512 == ptch * (dimension1 + 1) * (dimension2 + 1) + j * (dimension1 + 1) + i) {
+                        ptch--;
+                    }
+                    curve_point += bernstein(dimension1, i, u) * point_set.at(ptch * (dimension1 + 1) * (dimension2 + 1) + j * (dimension1 + 1) + i);
                 }
+                bzr_crv_ctrl_pnts.append(curve_point);
+                curve_point = QVector3D(0, 0, 0);
             }
-            bezier_surface.append(surf_point);
-            surf_point.setX(0.0);
-            surf_point.setY(0.0);
-            surf_point.setZ(0.0);
+            for(double v = 0.0; v <= 1.0; v += 0.001) {
+                QVector3D surf_point(0, 0, 0);
+                    for(int j = 0; j <= dimension2; j++) {
+                        surf_point += bernstein(dimension2, j, v) * bzr_crv_ctrl_pnts.at(j);
+                    }
+                    setPixelSafe(project3Dto2Dscreen(surf_point), QColor(200, 0, 0).rgba());
+                    surf_point = QVector3D(0, 0, 0);
+            }
+        }
+        //horisontal lines
+        for(double v = 0.0; v <= 1.0; v += 0.5) {
+            // get control points for bezier cuve
+            //draw bezier curve
+            bzr_crv_ctrl_pnts.clear();
+            for(int i = 0; i <= dimension1; i++) {
+                QVector3D curve_point(0, 0, 0);
+                for(int j = 0; j <= dimension2; j++) {
+                    if(512 == ptch * (dimension1 + 1) * (dimension2 + 1) + j * (dimension1 + 1) + i) {
+                        ptch--;
+                    }
+                    curve_point += bernstein(dimension2, j, v) * point_set.at(ptch * (dimension1 + 1) * (dimension2 + 1) + j * (dimension1 + 1) + i);
+                }
+                bzr_crv_ctrl_pnts.append(curve_point);
+                curve_point = QVector3D(0, 0, 0);
+            }
+            for(double u = 0.0; u <= 1.0; u += 0.001) {
+                QVector3D surf_point(0, 0, 0);
+                    for(int i = 0; i <= dimension1; i++) {
+                        surf_point += bernstein(dimension1, i, u) * bzr_crv_ctrl_pnts.at(i);
+                    }
+                    setPixelSafe(project3Dto2Dscreen(surf_point), QColor(200, 0, 0).rgba());
+                    surf_point = QVector3D(0, 0, 0);
+            }
         }
     }
 }
@@ -166,10 +206,10 @@ void Calculator::drawLine(QPoint pnt1, QPoint pnt2, QRgb clr) {
     int signY = curr_y < end_y ? 1 : -1;
     int err = deltaX - deltaY;
 
-    scene.setPixel(end_x, end_y, clr);
+    setPixelSafe(end_x, end_y, clr);
     while((end_x != curr_x) || (end_y != curr_y))
     {
-        scene.setPixel(curr_x, curr_y, clr);
+        setPixelSafe(curr_x, curr_y, clr);
         int err2 = err * 2;
         if(err2 > -deltaY){
             err -= deltaY;
@@ -184,27 +224,26 @@ void Calculator::drawLine(QPoint pnt1, QPoint pnt2, QRgb clr) {
 
 void Calculator::drawHLine(QPoint pnt1, QPoint pnt2) {
     for(int i = pnt1.x(); i < pnt2.x(); i ++){
-        scene.setPixel(checkXYRange(QPoint(i, pnt1.y())), QColor(0, 0, 0).rgba());
+        setPixelSafe(QPoint(i, pnt1.y()), QColor(0, 0, 0).rgba());
     }
 }
 void Calculator::drawVLine(QPoint pnt1, QPoint pnt2) {
     for(int i = pnt1.y(); i < pnt2.y(); i ++){
-        scene.setPixel(checkXYRange(QPoint(pnt1.x(), i)), QColor(0, 0, 0).rgba());
+        setPixelSafe(QPoint(pnt1.x(), i), QColor(0, 0, 0).rgba());
     }
 }
-QPoint Calculator::checkXYRange(QPoint pnt) {
-    int pnt_x = pnt.x(), pnt_y = pnt.y();
-    if(0 > pnt.x()) {
-        pnt_x = 0;
+
+void Calculator::setPixelSafe(int x_coord, int y_coord, QRgb color) {
+    if((0 > x_coord) || (scene.width() - 1 < x_coord))
+    {
+        return;
     }
-    if(scene.width() - 1 < pnt.x()) {
-        pnt_x = (scene.width() - 1);
+    if((0 > y_coord) || (scene.height() - 1 < y_coord)){
+        return;
     }
-    if(0 > pnt_y) {
-        pnt_y = 0;
-    }
-    if(scene.height() - 1 < pnt_y) {
-        pnt_y = (scene.height() - 1);
-    }
-    return QPoint(pnt_x, pnt_y);
+    scene.setPixel(x_coord, y_coord, color);
+    return;
+}
+void Calculator::setPixelSafe(QPoint pnt, QRgb color) {
+    setPixelSafe(pnt.x(), pnt.y(), color);
 }

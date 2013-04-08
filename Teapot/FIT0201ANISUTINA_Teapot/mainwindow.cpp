@@ -38,5 +38,6 @@ void MainWindow::resizeEvent(QResizeEvent *e)
     //projection.fill(QColor(255, 180, 180).rgba());
   /*  calculator.grabScene(projection);
     calculator.projectModel();*/
-    ui->teapotWg->setSceneSize(e->size());
+
+     ui->teapotWg->setSceneSize(e->size());
 }

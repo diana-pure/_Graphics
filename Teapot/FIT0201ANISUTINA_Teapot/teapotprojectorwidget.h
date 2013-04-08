@@ -4,6 +4,7 @@
 #include <QWidget>
 #include <calculator.h>
 #include <QMouseEvent>
+#include <QWheelEvent>
 
 namespace Ui {
 class TeapotProjectorWidget;
@@ -19,7 +20,7 @@ public:
     void paintEvent(QPaintEvent *);
     void mousePressEvent(QMouseEvent *);
     void mouseMoveEvent(QMouseEvent *);
-    //void mouseReleaseEvent(QMouseEvent *);
+    void wheelEvent(QWheelEvent *);
     void drawProjection();
     void setDistance(int);
     void setSceneSize(QSize);
