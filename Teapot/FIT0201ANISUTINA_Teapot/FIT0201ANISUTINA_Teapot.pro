@@ -14,9 +14,12 @@ TEMPLATE = app
 
 SOURCES += main.cpp\
         mainwindow.cpp \
-    calculator.cpp
+    calculator.cpp \
+    teapotprojectorwidget.cpp
 
 HEADERS  += mainwindow.h \
-    calculator.h
+    calculator.h \
+    teapotprojectorwidget.h
 
-FORMS    += mainwindow.ui
+FORMS    += mainwindow.ui \
+    teapotprojectorwidget.ui

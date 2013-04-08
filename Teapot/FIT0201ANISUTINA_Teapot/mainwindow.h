@@ -25,7 +25,7 @@ public slots:
 private:
     Ui::MainWindow *ui;
     QImage projection;
-    Calculator calculator;
+    //Calculator calculator;
 };
 
 #endif // MAINWINDOW_H

@@ -15,19 +15,6 @@
   </property>
   <widget class="QWidget" name="centralWidget">
    <layout class="QGridLayout" name="gridLayout">
-    <item row="0" column="1">
-     <spacer name="verticalSpacer">
-      <property name="orientation">
-       <enum>Qt::Vertical</enum>
-      </property>
-      <property name="sizeHint" stdset="0">
-       <size>
-        <width>20</width>
-        <height>40</height>
-       </size>
-      </property>
-     </spacer>
-    </item>
     <item row="1" column="1">
      <widget class="QSlider" name="segmentNumerSlider">
       <property name="orientation">
@@ -37,6 +24,12 @@
     </item>
     <item row="2" column="1">
      <widget class="QLabel" name="segmentNumberLbl">
+      <property name="maximumSize">
+       <size>
+        <width>16777215</width>
+        <height>10</height>
+       </size>
+      </property>
       <property name="text">
        <string>0</string>
       </property>
@@ -59,10 +52,21 @@
       </property>
      </widget>
     </item>
+    <item row="0" column="0" colspan="2">
+     <widget class="TeapotProjectorWidget" name="teapotWg" native="true"/>
+    </item>
    </layout>
   </widget>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
+ <customwidgets>
+  <customwidget>
+   <class>TeapotProjectorWidget</class>
+   <extends>QWidget</extends>
+   <header location="global">teapotprojectorwidget.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>
