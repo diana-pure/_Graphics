@@ -34,9 +34,9 @@ void MainWindow::drawProjection(QImage prj)
 void MainWindow::resizeEvent(QResizeEvent *e)
 {
     //emit windowWasResized(size());
-    projection = QImage(e->size(), QImage::Format_RGB888);
-    projection.fill(QColor(255, 180, 180).rgba());
+    //projection = QImage(e->size(), QImage::Format_RGB888);
+    //projection.fill(QColor(255, 180, 180).rgba());
   /*  calculator.grabScene(projection);
-    calculator.projectModel();
-    ui->teapotWg->setValue(e->size().width());*/
+    calculator.projectModel();*/
+    ui->teapotWg->setSceneSize(e->size());
 }

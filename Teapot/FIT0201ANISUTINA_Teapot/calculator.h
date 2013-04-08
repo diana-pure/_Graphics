@@ -16,6 +16,7 @@ public:
     void projectModel();
     void setStartPoint(QPoint);
     void setEndPoint(QPoint);
+    void setSceneSize(QSize);
 
     void drawLine(QPoint, QPoint, QRgb);
     void clearScene();
@@ -41,6 +42,7 @@ private:
     QVector3D right;
     QVector3D up;
     QImage scene;
+    QSize scene_size;
     qreal dist;
     QPoint start_point;
     QPoint end_point;

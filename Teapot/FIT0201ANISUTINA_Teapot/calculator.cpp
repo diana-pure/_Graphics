@@ -15,7 +15,8 @@ Calculator::Calculator(QObject *parent) :
     beta = 1.0;
     up = QVector3D(0, 0, 50);
     eye = QVector3D(300, 0, 0);
-    scene = QImage(600, 400, QImage::Format_RGB888);
+    scene_size = QSize(600, 400);
+    scene = QImage(scene_size, QImage::Format_RGB888);
     scene.fill(QColor(255, 255, 255).rgba());
     fillCoordinates();
 }
@@ -73,6 +74,10 @@ void Calculator::setEndPoint(QPoint pnt) {
     //QMutexLocker locker(&mutex);
     end_point = pnt;
 }
+void Calculator::setSceneSize(QSize sz) {
+    //QMutexLocker locker(&mutex);
+    scene_size = sz;
+}
 void Calculator::grabScene(QImage scn) {
     // what about synchronization ?
     QMutexLocker locker(&mutex);
@@ -80,6 +85,7 @@ void Calculator::grabScene(QImage scn) {
 }
 
 void Calculator::clearScene() {
+    scene = QImage(scene_size, QImage::Format_RGB888);
     scene.fill(QColor(255, 255, 255).rgba());
 }
 void Calculator::drawTeapot() {

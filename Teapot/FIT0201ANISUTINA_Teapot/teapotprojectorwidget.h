@@ -22,7 +22,7 @@ public:
     //void mouseReleaseEvent(QMouseEvent *);
     void drawProjection();
     void setDistance(int);
-
+    void setSceneSize(QSize);
 
 public slots:
     void redrawProjection(QImage);

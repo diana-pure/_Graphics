@@ -7,7 +7,7 @@ TeapotProjectorWidget::TeapotProjectorWidget(QWidget *parent) :
     ui(new Ui::TeapotProjectorWidget)
 {
     ui->setupUi(this);
-    scene = QImage(600, 400, QImage::Format_RGB888);
+    scene = QImage(700, 500, QImage::Format_RGB888);
     calculator.grabScene(scene);
     connect(&calculator, SIGNAL(readyProjection(QImage)), this, SLOT(redrawProjection(QImage)));
     calculator.projectModel();
@@ -37,4 +37,9 @@ void TeapotProjectorWidget::drawProjection() {
 void TeapotProjectorWidget::redrawProjection(QImage proj) {
     scene = proj;
     update();
+}
+
+void TeapotProjectorWidget::setSceneSize(QSize sz) {
+    calculator.setSceneSize(sz);
+    calculator.projectModel();
 }
