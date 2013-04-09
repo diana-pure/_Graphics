@@ -11,59 +11,54 @@ class Calculator : public QThread
     Q_OBJECT
 public:
     explicit Calculator(QObject *parent = 0);
+    void fillCoordinates();
     void run();
-    void grabScene(QImage);
+    void clearScene();
+    void drawAxis();
+    void countAngles();
+    void countVectors();
+    double bernstein(int dim, int indx, double arg);
+    int factorial(int);
+    QPoint project3Dto2Dscreen(QVector3D);
+
     void projectModel();
     void setStartPoint(QPoint);
     void setEndPoint(QPoint);
     void setSceneSize(QSize);
-    void moveCameraPosition(double);
-    void setPixelSafe(int, int, QRgb);
-    void setPixelSafe(QPoint, QRgb);
     void setSegmentNum(int);
-    void setDistance(int);
-    void drawAxis();
+    void setCameraPosition(int);
+    void moveCameraPosition(int);
 
     void drawLine(QPoint, QPoint, QRgb);
-    void clearScene();
     void drawHLine(QPoint, QPoint, QRgb);
     void drawVLine(QPoint, QPoint, QRgb);
-    QPoint project3Dto2Dscreen(QVector3D);
-    void fillCoordinates();
-    void drawTeapot();
-    double bernstein(int dim, int indx, double arg);
-    long factorial(int);
-    
+    void setPixelSafe(int, int, QRgb);
+    void setPixelSafe(QPoint, QRgb);
+
 signals:
     void readyProjection(QImage);
-    
-public slots:
 
 private:
-   // QImage projection;
-    QMutex mutex;
-
+    QImage scene;
+    int NUM_SEGMENTS;
+    QSize scene_size;
     QVector3D eye;
     QVector3D right;
     QVector3D up;
-    QImage scene;
-    QSize scene_size;
-    qreal dist;
     QPoint start_point;
     QPoint end_point;
     float alpha;
     float beta;
     QVector<QVector3D> point_set;
-    QVector<QVector3D> bezier_surface;
-    QVector<QVector3D> test;
     QVector<QVector3D> bzr_crv_ctrl_pnts;
+    int patch_number;
     int dimension1;
     int dimension2;
-    int patch_number;
-    int NUM_SEGMENTS;
+    qreal dist;
     QRgb teapot_color;
+    QMutex mutex;
     bool draw_axis_on;
-    
+    bool break_flag;
 };
 
 #endif // CALCULATOR_H
