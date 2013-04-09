@@ -24,6 +24,7 @@ public:
     void drawProjection();
     void setDistance(int);
     void setSceneSize(QSize);
+    void axisControl(bool);
 
 public slots:
     void redrawProjection(QImage);

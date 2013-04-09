@@ -59,3 +59,8 @@ void TeapotProjectorWidget::changeDistance(int dst) {
     calculator.setCameraPosition(dst);
     calculator.projectModel();
 }
+
+void TeapotProjectorWidget::axisControl(bool flag) {
+    calculator.axisControl(flag);
+    calculator.projectModel();
+}

@@ -21,3 +21,8 @@ void MainWindow::resizeEvent(QResizeEvent *e)
 {
      ui->teapotWg->setSceneSize(e->size());
 }
+
+void MainWindow::on_axisFlag_clicked()
+{
+    ui->teapotWg->axisControl(ui->axisFlag->isChecked());
+}

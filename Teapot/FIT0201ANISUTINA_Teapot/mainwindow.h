@@ -18,6 +18,9 @@ public:
     ~MainWindow();
     void resizeEvent(QResizeEvent *e);
 
+private slots:
+    void on_axisFlag_clicked();
+
 private:
     Ui::MainWindow *ui;
 };

@@ -28,6 +28,7 @@ public:
     void setSegmentNum(int);
     void setCameraPosition(int);
     void moveCameraPosition(int);
+    void axisControl(bool);
 
     void drawLine(QPoint, QPoint, QRgb);
     void drawHLine(QPoint, QPoint, QRgb);

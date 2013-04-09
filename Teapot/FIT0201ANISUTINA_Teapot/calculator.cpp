@@ -242,6 +242,11 @@ void Calculator::moveCameraPosition(int dst) {
     eye = (eye.length() + dst) * eye.normalized();
     break_flag = true;
 }
+void Calculator::axisControl(bool flag) {
+    QMutexLocker locker(&mutex);
+    draw_axis_on = flag;
+    break_flag = true;
+}
 void Calculator::drawLine(QPoint pnt1, QPoint pnt2, QRgb clr) {
     int curr_x = pnt1.x(), curr_y = pnt1.y(), end_x = pnt2.x(), end_y = pnt2.y();
     if(curr_y == end_y) {
