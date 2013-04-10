@@ -5,6 +5,7 @@
 #include <QImage>
 #include <QMutex>
 #include <QVector3D>
+#include <QString>
 
 class Calculator : public QThread
 {
@@ -29,6 +30,9 @@ public:
     void setCameraPosition(int);
     void moveCameraPosition(int);
     void axisControl(bool);
+
+public slots:
+    void updateProjection(QString);
 
     void drawLine(QPoint, QPoint, QRgb);
     void drawHLine(QPoint, QPoint, QRgb);
@@ -60,6 +64,8 @@ private:
     QMutex mutex;
     bool draw_axis_on;
     bool break_flag;
+    QString filename;
+    bool model_was_changed;
 };
 
 #endif // CALCULATOR_H

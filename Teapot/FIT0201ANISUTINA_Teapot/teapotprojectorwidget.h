@@ -30,11 +30,13 @@ public slots:
     void redrawProjection(QImage);
     void changeSegmentNumber(int);
     void changeDistance(int);
+    void updateProjection(QString);
     
 private:
     Ui::TeapotProjectorWidget *ui;
     Calculator calculator;
     QImage scene;
+
 };
 
 #endif // TEAPOTPROJECTORWIDGET_H

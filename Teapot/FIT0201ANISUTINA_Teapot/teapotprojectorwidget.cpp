@@ -7,8 +7,6 @@ TeapotProjectorWidget::TeapotProjectorWidget(QWidget *parent) :
     ui(new Ui::TeapotProjectorWidget)
 {
     ui->setupUi(this);
-    //scene = QImage(700, 500, QImage::Format_RGB888);
-    //calculator.grabScene(scene);
     connect(&calculator, SIGNAL(readyProjection(QImage)), this, SLOT(redrawProjection(QImage)));
     calculator.projectModel();
 }
@@ -62,5 +60,10 @@ void TeapotProjectorWidget::changeDistance(int dst) {
 
 void TeapotProjectorWidget::axisControl(bool flag) {
     calculator.axisControl(flag);
+    calculator.projectModel();
+}
+
+void TeapotProjectorWidget::updateProjection(QString filename) {
+    calculator.updateProjection(filename);
     calculator.projectModel();
 }

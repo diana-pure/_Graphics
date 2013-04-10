@@ -17,12 +17,15 @@ public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
     void resizeEvent(QResizeEvent *e);
+    void loadListOfFiles();
 
 private slots:
     void on_axisFlag_clicked();
+    void updateProjection(QString);
 
 private:
     Ui::MainWindow *ui;
+    QStringList files_names;
 };
 
 #endif // MAINWINDOW_H

@@ -15,15 +15,28 @@
   </property>
   <widget class="QWidget" name="centralWidget">
    <layout class="QGridLayout" name="gridLayout">
+    <item row="1" column="5" rowspan="3">
+     <widget class="QListWidget" name="modelsList">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+      <property name="maximumSize">
+       <size>
+        <width>85</width>
+        <height>75</height>
+       </size>
+      </property>
+     </widget>
+    </item>
     <item row="2" column="3">
      <widget class="QLabel" name="segmentsLbl">
       <property name="text">
        <string>segments</string>
       </property>
      </widget>
-    </item>
-    <item row="0" column="0" colspan="5">
-     <widget class="TeapotProjectorWidget" name="teapotWg" native="true"/>
     </item>
     <item row="2" column="1">
      <widget class="QSlider" name="distanceSlider">
@@ -59,6 +72,16 @@
        </size>
       </property>
      </spacer>
+    </item>
+    <item row="1" column="0">
+     <widget class="QCheckBox" name="axisFlag">
+      <property name="text">
+       <string>axis</string>
+      </property>
+      <property name="checked">
+       <bool>true</bool>
+      </property>
+     </widget>
     </item>
     <item row="2" column="0">
      <widget class="QLabel" name="distanceLbl_2">
@@ -100,15 +123,8 @@
       </property>
      </widget>
     </item>
-    <item row="1" column="0">
-     <widget class="QCheckBox" name="axisFlag">
-      <property name="text">
-       <string>axis</string>
-      </property>
-     </widget>
-    </item>
-    <item row="4" column="4">
-     <widget class="QComboBox" name="modelsBox"/>
+    <item row="0" column="0" colspan="6">
+     <widget class="TeapotProjectorWidget" name="teapotWg" native="true"/>
     </item>
    </layout>
   </widget>

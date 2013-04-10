@@ -5,7 +5,8 @@
 #include <QMatrix4x4>
 #include <fstream>
 #include <iostream>
-#include <QDebug>
+#include <cstdio>
+#include <QFile>
 
 Calculator::Calculator(QObject *parent) :
     QThread(parent)
@@ -21,17 +22,18 @@ Calculator::Calculator(QObject *parent) :
     teapot_color = QColor(222, 49, 99).rgba();
     draw_axis_on = true;//false;
     break_flag = false;
+    filename = QString("teapot.bpt");
     fillCoordinates();   // was every filed initialized
 }
 void Calculator::fillCoordinates() {
-    std::ifstream source("D:\\TMP\\teapotCGA.bpt");
-    //std::ifstream source("D:\\TMP\\teacup.bpt");
-    //std::ifstream source("D:\\TMP\\teapottall.bpt");
-    //std::ifstream source("D:\\TMP\\teaspoon.bpt");
-    if(!source) {
-        std::cerr << "file was not open";
-        return;
+    QString name_to_load(":/");
+    name_to_load.append(filename);
+    QFile file(name_to_load);
+    if(!file.open(QIODevice::ReadOnly)) {
+        file.close();
     }
+    QTextStream source(&file);
+    point_set.clear();
     source >> patch_number;
     for(int i = 0; i < patch_number; i++) {
         source >> dimension1 >> dimension2;
@@ -39,23 +41,26 @@ void Calculator::fillCoordinates() {
             double x = 0.0, y = 0.0, z = 0.0;
             source >> x >> y >> z;
             point_set.append(QVector3D(x * 30, y * 30, z * 30));
+            //point_set.append(QVector3D(x, y, z));
         }
     }
-    if(source) {
-          source.close();
-    }
+    model_was_changed = false;
+    file.close();
 }
 void Calculator::run()
 {
-   /* mutex.lock();
+    if(model_was_changed) {
+        fillCoordinates();
+    }
+    mutex.lock();
         int NUM_SEGMENTS = this->NUM_SEGMENTS;
-        QSize size = scene_size;
-        QVector3D eye = this->eye;
-        QPoint start_point = start_point_origin;
-        QPoint end_point = end_point_origin;
-        bool draw_axis = draw_axis_on;
+        QSize scene_size = this->scene_size;
+      //  QVector3D eye = this->eye;
+        QPoint start_point = this->start_point;
+        QPoint end_point = this->end_point;
+        bool draw_axis_on = this->draw_axis_on;
     mutex.unlock();
-*/
+
     //clearScene(); //is it necessary to protect when size is chanched
     //countAngles();
     //countVectors();
@@ -132,7 +137,7 @@ void Calculator::run()
                     surf_point = QVector3D(0, 0, 0);
             }
         }
-   /*     if(true == break_flag) {
+    /*    if(true == break_flag) {
             mutex.lock();
                 break_flag = false;
             mutex.unlock();
@@ -247,6 +252,14 @@ void Calculator::axisControl(bool flag) {
     draw_axis_on = flag;
     break_flag = true;
 }
+
+void Calculator::updateProjection(QString name) {
+    QMutexLocker locker(&mutex);
+    filename = name;
+    model_was_changed = true;
+    break_flag = true;
+}
+
 void Calculator::drawLine(QPoint pnt1, QPoint pnt2, QRgb clr) {
     int curr_x = pnt1.x(), curr_y = pnt1.y(), end_x = pnt2.x(), end_y = pnt2.y();
     if(curr_y == end_y) {

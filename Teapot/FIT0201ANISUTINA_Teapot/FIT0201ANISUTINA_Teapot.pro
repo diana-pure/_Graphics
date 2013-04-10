@@ -23,3 +23,6 @@ HEADERS  += mainwindow.h \
 
 FORMS    += mainwindow.ui \
     teapotprojectorwidget.ui
+
+RESOURCES += \
+    3dmodels.qrc
