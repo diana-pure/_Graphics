@@ -30,6 +30,10 @@ public:
     void setCameraPosition(int);
     void moveCameraPosition(int);
     void axisControl(bool);
+    bool behindThePlane(QVector3D);
+    void checkRangeForBox(QVector3D);
+    void drawBox();
+    void boxControl();
 
 public slots:
     void updateProjection(QString);
@@ -66,6 +70,8 @@ private:
     bool break_flag;
     QString filename;
     bool model_was_changed;
+    QVector3D center_projected;
+    QVector<QVector3D> for_box;
 };
 
 #endif // CALCULATOR_H
