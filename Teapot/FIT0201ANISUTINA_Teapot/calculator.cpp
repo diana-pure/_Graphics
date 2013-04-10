@@ -21,6 +21,7 @@ Calculator::Calculator(QObject *parent) :
     dist = 150;
     teapot_color = QColor(222, 49, 99).rgba();
     draw_axis_on = true;
+    draw_box_on = false;
     break_flag = false;
     filename = QString("teapot.bpt");
     fillCoordinates();   // was every filed initialized
@@ -150,12 +151,17 @@ void Calculator::run()
                     surf_point = QVector3D(0, 0, 0);
             }
         }
-    /*    if(true == break_flag) {
+
+        if(draw_box_on) {
+            drawBox();
+        }
+
+        if(true == break_flag) {
             mutex.lock();
                 break_flag = false;
             mutex.unlock();
             return;
-        }*/
+        }
     }
     emit readyProjection(scene);
 }
@@ -165,9 +171,9 @@ void Calculator::clearScene() {
 }
 void Calculator::drawAxis() {
     QVector3D center(0, 0, 0);
-    QVector3D x_axis(50, 0, 0);
-    QVector3D y_axis(0, 50, 0);
-    QVector3D z_axis(0, 0, 50);
+    QVector3D x_axis(10, 0, 0);
+    QVector3D y_axis(0, 10, 0);
+    QVector3D z_axis(0, 0, 10);
 
     drawLine(project3Dto2Dscreen(center), project3Dto2Dscreen(x_axis), QColor(255, 0, 0).rgba());
     drawLine(project3Dto2Dscreen(center), project3Dto2Dscreen(y_axis), QColor(0, 255, 0).rgba());
@@ -248,92 +254,102 @@ void Calculator::checkRangeForBox(QVector3D pnt) {
 void Calculator::drawBox() {
     QVector3D begin_line(for_box.at(0).x(), for_box.at(2).y(), for_box.at(4).z());
     QVector3D end_line(for_box.at(0).x(), for_box.at(3).y(), for_box.at(4).z());
-    drawLine(project3Dto2Dscreen(begin_line), project3Dto2Dscreen(end_line), QColor(255, 0, 0).rgba());
+    drawLine(project3Dto2Dscreen(begin_line), project3Dto2Dscreen(end_line), teapot_color);
     begin_line.setY(for_box.at(3).y());
     end_line.setX(for_box.at(1).x());
-    drawLine(project3Dto2Dscreen(begin_line), project3Dto2Dscreen(end_line), QColor(255, 0, 0).rgba());
+    drawLine(project3Dto2Dscreen(begin_line), project3Dto2Dscreen(end_line), teapot_color);
     begin_line.setX(for_box.at(1).x());
-    end_line.setY(for_box.at(3).y());
-    drawLine(project3Dto2Dscreen(begin_line), project3Dto2Dscreen(end_line), QColor(255, 0, 0).rgba());
+    end_line.setY(for_box.at(2).y());
+    drawLine(project3Dto2Dscreen(begin_line), project3Dto2Dscreen(end_line), teapot_color);
     begin_line.setY(for_box.at(2).y());
     end_line.setX(for_box.at(0).x());
-    drawLine(project3Dto2Dscreen(begin_line), project3Dto2Dscreen(end_line), QColor(255, 0, 0).rgba());
+    drawLine(project3Dto2Dscreen(begin_line), project3Dto2Dscreen(end_line), teapot_color);
+
 
     begin_line = QVector3D(for_box.at(0).x(), for_box.at(2).y(), for_box.at(5).z());
     end_line = QVector3D(for_box.at(0).x(), for_box.at(3).y(), for_box.at(5).z());
-    drawLine(project3Dto2Dscreen(begin_line), project3Dto2Dscreen(end_line), QColor(255, 0, 0).rgba());
+    drawLine(project3Dto2Dscreen(begin_line), project3Dto2Dscreen(end_line), teapot_color);
     begin_line.setY(for_box.at(3).y());
     end_line.setX(for_box.at(1).x());
-    drawLine(project3Dto2Dscreen(begin_line), project3Dto2Dscreen(end_line), QColor(255, 0, 0).rgba());
+    drawLine(project3Dto2Dscreen(begin_line), project3Dto2Dscreen(end_line), teapot_color);
     begin_line.setX(for_box.at(1).x());
-    end_line.setY(for_box.at(3).y());
-    drawLine(project3Dto2Dscreen(begin_line), project3Dto2Dscreen(end_line), QColor(255, 0, 0).rgba());
+    end_line.setY(for_box.at(2).y());
+    drawLine(project3Dto2Dscreen(begin_line), project3Dto2Dscreen(end_line), teapot_color);
     begin_line.setY(for_box.at(2).y());
     end_line.setX(for_box.at(0).x());
-    drawLine(project3Dto2Dscreen(begin_line), project3Dto2Dscreen(end_line), QColor(255, 0, 0).rgba());
+    drawLine(project3Dto2Dscreen(begin_line), project3Dto2Dscreen(end_line), teapot_color);
 
 
     begin_line = QVector3D(for_box.at(0).x(), for_box.at(2).y(), for_box.at(4).z());
     end_line = QVector3D(for_box.at(0).x(), for_box.at(2).y(), for_box.at(5).z());
-    drawLine(project3Dto2Dscreen(begin_line), project3Dto2Dscreen(end_line), QColor(255, 0, 0).rgba());
+    drawLine(project3Dto2Dscreen(begin_line), project3Dto2Dscreen(end_line), teapot_color);
     begin_line.setY(for_box.at(3).y());
     end_line.setY(for_box.at(3).y());
-    drawLine(project3Dto2Dscreen(begin_line), project3Dto2Dscreen(end_line), QColor(255, 0, 0).rgba());
+    drawLine(project3Dto2Dscreen(begin_line), project3Dto2Dscreen(end_line), teapot_color);
     begin_line.setX(for_box.at(1).x());
     end_line.setX(for_box.at(1).x());
-    drawLine(project3Dto2Dscreen(begin_line), project3Dto2Dscreen(end_line), QColor(255, 0, 0).rgba());
+    drawLine(project3Dto2Dscreen(begin_line), project3Dto2Dscreen(end_line), teapot_color);
     begin_line.setY(for_box.at(2).y());
     end_line.setY(for_box.at(2).y());
-    drawLine(project3Dto2Dscreen(begin_line), project3Dto2Dscreen(end_line), QColor(255, 0, 0).rgba());
+    drawLine(project3Dto2Dscreen(begin_line), project3Dto2Dscreen(end_line), teapot_color);
+
 }
 void Calculator::projectModel()
 {
     QMutexLocker locker(&mutex);
     if(!isRunning()){
         start();
+    } else {
+        break_flag = true;
     }
 }
 void Calculator::setStartPoint(QPoint pnt) {
     QMutexLocker locker(&mutex);
     start_point = pnt;
-    break_flag = true;
+    //break_flag = true;
 }
 void Calculator::setEndPoint(QPoint pnt) {
     QMutexLocker locker(&mutex);
     end_point = pnt;
-    break_flag = true;
+    //break_flag = true;
 }
 void Calculator::setSceneSize(QSize sz) {
     QMutexLocker locker(&mutex);
     scene_size = sz;
-    break_flag = true;
+    //break_flag = true;
 }
 void Calculator::setSegmentNum(int num) {
     QMutexLocker locker(&mutex);
     NUM_SEGMENTS = (0 == num) ? 1 : num;
-    break_flag = true;
+    //break_flag = true;
 }
 void Calculator::setCameraPosition(int dst) {
     QMutexLocker locker(&mutex);
-    eye = dst * eye.normalized();
-    break_flag = true;
+        eye = dst * eye.normalized();
+    //break_flag = true;
 }
-void Calculator::moveCameraPosition(int dst) {
+void Calculator::moveCameraPosition(double dst) {
     QMutexLocker locker(&mutex);
-    eye = (eye.length() - dst) * eye.normalized();
-    break_flag = true;
+    if(qAbs(eye.length() - dst) > 0) {
+        eye = (eye.length() - dst) * eye.normalized();
+    }
+//    break_flag = true;
 }
 void Calculator::axisControl(bool flag) {
     QMutexLocker locker(&mutex);
     draw_axis_on = flag;
-    break_flag = true;
+  //  break_flag = true;
 }
-
+void Calculator::boxControl(bool flag) {
+    QMutexLocker locker(&mutex);
+    draw_box_on = flag;
+ //   break_flag = true;
+}
 void Calculator::updateProjection(QString name) {
     QMutexLocker locker(&mutex);
     filename = name;
     model_was_changed = true;
-    break_flag = true;
+   // break_flag = true;
 }
 
 void Calculator::drawLine(QPoint pnt1, QPoint pnt2, QRgb clr) {

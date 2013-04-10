@@ -28,12 +28,12 @@ public:
     void setSceneSize(QSize);
     void setSegmentNum(int);
     void setCameraPosition(int);
-    void moveCameraPosition(int);
+    void moveCameraPosition(double);
     void axisControl(bool);
     bool behindThePlane(QVector3D);
     void checkRangeForBox(QVector3D);
     void drawBox();
-    void boxControl();
+    void boxControl(bool);
 
 public slots:
     void updateProjection(QString);
@@ -67,6 +67,7 @@ private:
     QRgb teapot_color;
     QMutex mutex;
     bool draw_axis_on;
+    bool draw_box_on;
     bool break_flag;
     QString filename;
     bool model_was_changed;

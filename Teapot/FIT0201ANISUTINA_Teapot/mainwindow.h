@@ -23,6 +23,8 @@ private slots:
     void on_axisFlag_clicked();
     void updateProjection(QString);
 
+    void on_boxFlag_clicked();
+
 private:
     Ui::MainWindow *ui;
     QStringList files_names;

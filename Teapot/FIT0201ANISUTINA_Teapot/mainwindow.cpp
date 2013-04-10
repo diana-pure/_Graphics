@@ -43,3 +43,8 @@ void MainWindow::updateProjection(QString filename)
 {
     ui->teapotWg->updateProjection(filename);
 }
+
+void MainWindow::on_boxFlag_clicked()
+{
+    ui->teapotWg->boxControl(ui->boxFlag->isChecked());
+}
