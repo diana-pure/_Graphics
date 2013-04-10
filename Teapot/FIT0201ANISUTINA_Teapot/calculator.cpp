@@ -203,7 +203,7 @@ QPoint Calculator::project3Dto2Dscreen(QVector3D point3D) { //todo: make easier 
     QVector3D eye1 = eye.normalized();
     up.normalize();
     right = up.crossProduct(up, eye1);
-    QVector3D center_projected = eye - (eye.length() - dist) * eye.normalized();
+    QVector3D center_projected = (eye.length() - dist) * eye.normalized();
     double t_star = - (eye.x() * (eye.x() - center_projected.x()) + eye.y() * (eye.y() - center_projected.y()) + eye.z() * (eye.z() - center_projected.z())) /
             (eye.x() * (point3D.x() - center_projected.x()) + eye.y() * (point3D.y() - center_projected.y()) + eye.z() * (point3D.z() - center_projected.z()) );
     QVector3D point3DonPlane3D = QVector3D(eye.x() + t_star * point3D.x(), eye.y() + t_star * point3D.y(), eye.z() + t_star * point3D.z());
@@ -244,7 +244,7 @@ void Calculator::setCameraPosition(int dst) {
 }
 void Calculator::moveCameraPosition(int dst) {
     QMutexLocker locker(&mutex);
-    eye = (eye.length() + dst) * eye.normalized();
+    eye = (eye.length() - dst) * eye.normalized();
     break_flag = true;
 }
 void Calculator::axisControl(bool flag) {

@@ -35,7 +35,6 @@ void TeapotProjectorWidget::wheelEvent(QWheelEvent *e) {
 }
 
 void TeapotProjectorWidget::drawProjection() {
-    //calculator.grabScene(scene);
     calculator.projectModel();
 }
 void TeapotProjectorWidget::redrawProjection(QImage proj) {
