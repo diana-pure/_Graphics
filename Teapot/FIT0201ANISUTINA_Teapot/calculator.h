@@ -6,12 +6,14 @@
 #include <QMutex>
 #include <QVector3D>
 #include <QString>
+#include <QWaitCondition>
 
 class Calculator : public QThread
 {
     Q_OBJECT
 public:
     explicit Calculator(QObject *parent = 0);
+    ~Calculator();
     void fillCoordinates();
     void run();
     void clearScene();
@@ -73,6 +75,8 @@ private:
     bool model_was_changed;
     QVector3D center_projected;
     QVector<QVector3D> for_box;
+    QWaitCondition condition;
+    bool abort_flag;
 };
 
 #endif // CALCULATOR_H

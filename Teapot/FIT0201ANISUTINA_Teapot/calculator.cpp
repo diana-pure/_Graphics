@@ -26,12 +26,14 @@ Calculator::Calculator(QObject *parent) :
     filename = QString("teapot.bpt");
     fillCoordinates();   // was every filed initialized
     center_projected = (eye.length() - dist) * eye.normalized();
-    for_box.append(QVector3D(0.0, 0.0, 0.0));
-    for_box.append(QVector3D(0.0, 0.0, 0.0));
-    for_box.append(QVector3D(0.0, 0.0, 0.0));
-    for_box.append(QVector3D(0.0, 0.0, 0.0));
-    for_box.append(QVector3D(0.0, 0.0, 0.0));
-    for_box.append(QVector3D(0.0, 0.0, 0.0));
+    abort_flag = false;
+}
+Calculator::~Calculator() {
+    mutex.lock();
+        abort_flag = true;
+        condition.wakeOne();
+    mutex.unlock();
+    wait();
 }
 void Calculator::fillCoordinates() {
     QString name_to_load(":/");
@@ -54,9 +56,16 @@ void Calculator::fillCoordinates() {
     }
     model_was_changed = false;
     file.close();
+    for_box.clear();
+    QVector3D pnt(0.0, 0.0, 0.0);
+    for(int i =0; i < 6; i++) {
+        for_box.append(pnt);
+    }
 }
 void Calculator::run()
 {
+    while(true) {
+
     if(model_was_changed) {
         fillCoordinates();
     }
@@ -67,6 +76,7 @@ void Calculator::run()
         QPoint start_point = this->start_point;
         QPoint end_point = this->end_point;
         bool draw_axis_on = this->draw_axis_on;
+        //bool draw_box_on = this->draw_box_on;
     mutex.unlock();
 
     //clearScene(); //is it necessary to protect when size is chanched
@@ -101,6 +111,13 @@ void Calculator::run()
     double STEP_discr = 1.0 / static_cast<double>(NUM_SEGMENTS);
     double STEP_contin = 0.0006;
     for(int ptch = 0; ptch < patch_number; ptch++) {
+
+        if(break_flag) {
+            break;
+        }
+        if(abort_flag) {
+            return;
+        }
         //vertical lines
         for(double u = 0.0; u <= 1.0; u += STEP_discr) {
             // get control points for bezier curve
@@ -151,19 +168,20 @@ void Calculator::run()
                     surf_point = QVector3D(0, 0, 0);
             }
         }
-
-        if(draw_box_on) {
-            drawBox();
-        }
-
-        if(true == break_flag) {
-            mutex.lock();
-                break_flag = false;
-            mutex.unlock();
-            return;
-        }
     }
-    emit readyProjection(scene);
+    if(draw_box_on) {
+        drawBox();
+    }
+    if (!break_flag) {
+        emit readyProjection(scene);
+    }
+    mutex.lock();
+        if (!break_flag) {
+            condition.wait(&mutex);
+        }
+        break_flag = false;
+    mutex.unlock();
+}
 }
 void Calculator::clearScene() {
     scene = QImage(scene_size, QImage::Format_RGB888);
@@ -252,6 +270,9 @@ void Calculator::checkRangeForBox(QVector3D pnt) {
     }
 }
 void Calculator::drawBox() {
+    mutex.lock();
+    QVector<QVector3D> for_box = this->for_box;
+    mutex.unlock();
     QVector3D begin_line(for_box.at(0).x(), for_box.at(2).y(), for_box.at(4).z());
     QVector3D end_line(for_box.at(0).x(), for_box.at(3).y(), for_box.at(4).z());
     drawLine(project3Dto2Dscreen(begin_line), project3Dto2Dscreen(end_line), teapot_color);
@@ -301,6 +322,7 @@ void Calculator::projectModel()
         start();
     } else {
         break_flag = true;
+        condition.wakeOne();
     }
 }
 void Calculator::setStartPoint(QPoint pnt) {
@@ -325,7 +347,7 @@ void Calculator::setSegmentNum(int num) {
 }
 void Calculator::setCameraPosition(int dst) {
     QMutexLocker locker(&mutex);
-        eye = dst * eye.normalized();
+     eye = dst * eye.normalized();
     //break_flag = true;
 }
 void Calculator::moveCameraPosition(double dst) {

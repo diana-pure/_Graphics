@@ -29,7 +29,7 @@ void TeapotProjectorWidget::mouseMoveEvent(QMouseEvent *e) {
     calculator.projectModel();
 }
 void TeapotProjectorWidget::wheelEvent(QWheelEvent *e) {
-    int numDegrees = e->delta() / 320.0;
+    double numDegrees = e->delta() / 32.0;
     calculator.moveCameraPosition(numDegrees);
     calculator.projectModel();
 }
