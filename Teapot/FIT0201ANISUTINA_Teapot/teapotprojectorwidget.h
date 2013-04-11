@@ -21,7 +21,6 @@ public:
     void mousePressEvent(QMouseEvent *);
     void mouseMoveEvent(QMouseEvent *);
     void wheelEvent(QWheelEvent *);
-    void drawProjection();
     void setDistance(int);
     void setSceneSize(QSize);
     void axisControl(bool);

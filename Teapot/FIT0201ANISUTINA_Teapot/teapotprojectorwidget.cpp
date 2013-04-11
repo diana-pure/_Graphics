@@ -4,20 +4,15 @@
 
 TeapotProjectorWidget::TeapotProjectorWidget(QWidget *parent) :
     QWidget(parent),
-    ui(new Ui::TeapotProjectorWidget)
-{
+    ui(new Ui::TeapotProjectorWidget) {
     ui->setupUi(this);
     connect(&calculator, SIGNAL(readyProjection(QImage)), this, SLOT(redrawProjection(QImage)));
     calculator.projectModel();
 }
-
-TeapotProjectorWidget::~TeapotProjectorWidget()
-{
+TeapotProjectorWidget::~TeapotProjectorWidget() {
     delete ui;
 }
-
-void TeapotProjectorWidget::paintEvent(QPaintEvent *)
-{
+void TeapotProjectorWidget::paintEvent(QPaintEvent *) {
     QPainter painter(this);
     painter.drawImage(0, 0, scene);
 }
@@ -34,20 +29,14 @@ void TeapotProjectorWidget::wheelEvent(QWheelEvent *e) {
     calculator.moveCameraPosition(numDegrees);
     calculator.projectModel();
 }
-
-void TeapotProjectorWidget::drawProjection() {
-    calculator.projectModel();
-}
 void TeapotProjectorWidget::redrawProjection(QImage proj) {
     scene = proj;
     update();
 }
-
 void TeapotProjectorWidget::setSceneSize(QSize sz) {
     calculator.setSceneSize(sz);
     calculator.projectModel();
 }
-
 void TeapotProjectorWidget::changeSegmentNumber(int num) {
     calculator.setSegmentNum(num);
     calculator.projectModel();

@@ -22,9 +22,7 @@ public:
 private slots:
     void on_axisFlag_clicked();
     void updateProjection(QString);
-
     void on_boxFlag_clicked();
-
     void on_scale_flag_clicked();
 
 private:

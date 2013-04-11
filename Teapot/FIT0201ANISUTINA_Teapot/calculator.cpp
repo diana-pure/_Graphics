@@ -199,10 +199,21 @@ void Calculator::drawAxis() {
     QVector3D x_axis(10, 0, 0);
     QVector3D y_axis(0, 10, 0);
     QVector3D z_axis(0, 0, 10);
-
-    drawLine(project3Dto2Dscreen(center), project3Dto2Dscreen(x_axis), QColor(255, 0, 0).rgba());
-    drawLine(project3Dto2Dscreen(center), project3Dto2Dscreen(y_axis), QColor(0, 255, 0).rgba());
-    drawLine(project3Dto2Dscreen(center), project3Dto2Dscreen(z_axis), QColor(0, 0, 255).rgba());
+    if(behindThePlane(x_axis)) {
+        drawLine(project3Dto2Dscreen(center), project3Dto2Dscreen(x_axis), QColor(255, 0, 0).rgba());
+    } else {
+        drawLine(project3Dto2Dscreen(center), lineCrossPlane(center, x_axis), QColor(255, 0, 0).rgba());
+    }
+    if(behindThePlane(y_axis)) {
+        drawLine(project3Dto2Dscreen(center), project3Dto2Dscreen(y_axis), QColor(0, 255, 0).rgba());
+    } else {
+        drawLine(project3Dto2Dscreen(center), lineCrossPlane(center, y_axis), QColor(0, 255, 0).rgba());
+    }
+    if(behindThePlane(y_axis)) {
+        drawLine(project3Dto2Dscreen(center), project3Dto2Dscreen(z_axis), QColor(0, 0, 255).rgba());
+    } else {
+        drawLine(project3Dto2Dscreen(center), lineCrossPlane(center, z_axis), QColor(0, 0, 255).rgba());
+    }
 }
 void Calculator::countAngles() {
     mutex.lock();
@@ -243,7 +254,7 @@ int Calculator::factorial(int arg) {
     }
 return result;
 }
-QPoint Calculator::project3Dto2Dscreen(QVector3D point3D) { //todo: make easier to understand
+QPoint Calculator::project3Dto2Dscreen(QVector3D point3D) {
     right = up.crossProduct(up, eye.normalized());
     center_projected = (eye.length() - dist) * eye.normalized();
     double t_star = - (eye.x() * (eye.x() - center_projected.x()) + eye.y() * (eye.y() - center_projected.y()) + eye.z() * (eye.z() - center_projected.z())) /
@@ -282,50 +293,61 @@ void Calculator::drawBox() {
     mutex.unlock();
     QVector3D begin_line(for_box.at(0).x(), for_box.at(2).y(), for_box.at(4).z());
     QVector3D end_line(for_box.at(0).x(), for_box.at(3).y(), for_box.at(4).z());
-    drawLine(project3Dto2Dscreen(begin_line), project3Dto2Dscreen(end_line), teapot_color);
+    drawRib(begin_line, end_line);
+//    drawLine(project3Dto2Dscreen(begin_line), project3Dto2Dscreen(end_line), teapot_color);
     begin_line.setY(for_box.at(3).y());
     end_line.setX(for_box.at(1).x());
-    drawLine(project3Dto2Dscreen(begin_line), project3Dto2Dscreen(end_line), teapot_color);
+    drawRib(begin_line, end_line);
+//    drawLine(project3Dto2Dscreen(begin_line), project3Dto2Dscreen(end_line), teapot_color);
     begin_line.setX(for_box.at(1).x());
-    end_line.setY(for_box.at(2).y());
-    drawLine(project3Dto2Dscreen(begin_line), project3Dto2Dscreen(end_line), teapot_color);
+    end_line.setY(for_box.at(2).y());  
+    drawRib(begin_line, end_line);
+//drawLine(project3Dto2Dscreen(begin_line), project3Dto2Dscreen(end_line), teapot_color);
     begin_line.setY(for_box.at(2).y());
-    end_line.setX(for_box.at(0).x());
-    drawLine(project3Dto2Dscreen(begin_line), project3Dto2Dscreen(end_line), teapot_color);
+    end_line.setX(for_box.at(0).x());  
+    drawRib(begin_line, end_line);
+//drawLine(project3Dto2Dscreen(begin_line), project3Dto2Dscreen(end_line), teapot_color);
 
 
     begin_line = QVector3D(for_box.at(0).x(), for_box.at(2).y(), for_box.at(5).z());
     end_line = QVector3D(for_box.at(0).x(), for_box.at(3).y(), for_box.at(5).z());
-    drawLine(project3Dto2Dscreen(begin_line), project3Dto2Dscreen(end_line), teapot_color);
+    drawRib(begin_line, end_line);
+//    drawLine(project3Dto2Dscreen(begin_line), project3Dto2Dscreen(end_line), teapot_color);
     begin_line.setY(for_box.at(3).y());
     end_line.setX(for_box.at(1).x());
-    drawLine(project3Dto2Dscreen(begin_line), project3Dto2Dscreen(end_line), teapot_color);
+    drawRib(begin_line, end_line);
+//    drawLine(project3Dto2Dscreen(begin_line), project3Dto2Dscreen(end_line), teapot_color);
     begin_line.setX(for_box.at(1).x());
     end_line.setY(for_box.at(2).y());
-    drawLine(project3Dto2Dscreen(begin_line), project3Dto2Dscreen(end_line), teapot_color);
+    drawRib(begin_line, end_line);
+//    drawLine(project3Dto2Dscreen(begin_line), project3Dto2Dscreen(end_line), teapot_color);
     begin_line.setY(for_box.at(2).y());
     end_line.setX(for_box.at(0).x());
-    drawLine(project3Dto2Dscreen(begin_line), project3Dto2Dscreen(end_line), teapot_color);
+    drawRib(begin_line, end_line);
+//    drawLine(project3Dto2Dscreen(begin_line), project3Dto2Dscreen(end_line), teapot_color);
 
 
     begin_line = QVector3D(for_box.at(0).x(), for_box.at(2).y(), for_box.at(4).z());
-    end_line = QVector3D(for_box.at(0).x(), for_box.at(2).y(), for_box.at(5).z());
-    drawLine(project3Dto2Dscreen(begin_line), project3Dto2Dscreen(end_line), teapot_color);
+    end_line = QVector3D(for_box.at(0).x(), for_box.at(2).y(), for_box.at(5).z());  
+    drawRib(begin_line, end_line);
+//    drawLine(project3Dto2Dscreen(begin_line), project3Dto2Dscreen(end_line), teapot_color);
     begin_line.setY(for_box.at(3).y());
     end_line.setY(for_box.at(3).y());
-    drawLine(project3Dto2Dscreen(begin_line), project3Dto2Dscreen(end_line), teapot_color);
+    drawRib(begin_line, end_line);
+//  drawLine(project3Dto2Dscreen(begin_line), project3Dto2Dscreen(end_line), teapot_color);
     begin_line.setX(for_box.at(1).x());
     end_line.setX(for_box.at(1).x());
-    drawLine(project3Dto2Dscreen(begin_line), project3Dto2Dscreen(end_line), teapot_color);
+    drawRib(begin_line, end_line);
+//    drawLine(project3Dto2Dscreen(begin_line), project3Dto2Dscreen(end_line), teapot_color);
     begin_line.setY(for_box.at(2).y());
     end_line.setY(for_box.at(2).y());
-    drawLine(project3Dto2Dscreen(begin_line), project3Dto2Dscreen(end_line), teapot_color);
+    drawRib(begin_line, end_line);
+//    drawLine(project3Dto2Dscreen(begin_line), project3Dto2Dscreen(end_line), teapot_color);
 
 }
-void Calculator::projectModel()
-{
+void Calculator::projectModel() {
     QMutexLocker locker(&mutex);
-    if(!isRunning()){
+    if(!isRunning()) {
         start();
     } else {
         break_flag = true;
@@ -346,7 +368,6 @@ void Calculator::setSceneSize(QSize sz) {
 }
 void Calculator::setSegmentNum(int num) {
     QMutexLocker locker(&mutex);
-    //NUM_SEGMENTS = (0 == num) ? 1 : num;
     NUM_SEGMENTS = num;
 }
 void Calculator::setCameraPosition(int dst) {
@@ -357,7 +378,7 @@ void Calculator::setCameraPosition(int dst) {
 }
 void Calculator::setDistanceToPlane(int dst) {
     QMutexLocker locker(&mutex);
-    if(dst >= 20) {
+    if((dst > 0) && (dst < eye.length())) {
         dist = dst;
     }
 }
@@ -385,7 +406,6 @@ void Calculator::updateProjection(QString name) {
     filename = name;
     model_was_changed = true;
 }
-
 void Calculator::drawLine(QPoint pnt1, QPoint pnt2, QRgb clr) {
     int curr_x = pnt1.x(), curr_y = pnt1.y(), end_x = pnt2.x(), end_y = pnt2.y();
     if(curr_y == end_y) {
@@ -403,8 +423,7 @@ void Calculator::drawLine(QPoint pnt1, QPoint pnt2, QRgb clr) {
     int err = deltaX - deltaY;
 
     setPixelSafe(end_x, end_y, clr);
-    while((end_x != curr_x) || (end_y != curr_y))
-    {
+    while((end_x != curr_x) || (end_y != curr_y)) {
         setPixelSafe(curr_x, curr_y, clr);
         int err2 = err * 2;
         if(err2 > -deltaY) {
@@ -449,7 +468,6 @@ void Calculator::setPixelSafe(QPoint pnt, QRgb color) {
 QImage Calculator::drawSimpleTeapot() {
 
     mutex.lock();
-        int NUM_SEGMENTS = this->NUM_SEGMENTS;
         QSize scene_size = this->scene_size;
         QPoint start_point = this->start_point;
         QPoint end_point = this->end_point;
@@ -510,4 +528,28 @@ QImage Calculator::drawSimpleTeapot() {
         drawLine(project3Dto2Dscreen(matr_rot.mapVector(bezier_surface.at(i * 4 + 2))), project3Dto2Dscreen(matr_rot.mapVector(bezier_surface.at(i * 4))), teapot_color);
     }
     return scene;
+}
+void Calculator::drawRib(QVector3D begin_line, QVector3D end_line) {
+    if(behindThePlane(begin_line) || behindThePlane(end_line)) {
+        QPoint begin_line2d = project3Dto2Dscreen(begin_line);
+        QPoint end_line2d = project3Dto2Dscreen(end_line);
+        if(!behindThePlane(begin_line)) {
+            begin_line2d = lineCrossPlane(begin_line, end_line);
+        }
+        if(!behindThePlane(end_line)) {
+            end_line2d = lineCrossPlane(begin_line, end_line);
+        }
+        drawLine(begin_line2d, end_line2d, teapot_color);
+    }
+}
+QPoint Calculator::lineCrossPlane(QVector3D begin_line, QVector3D end_line) {
+    right = up.crossProduct(up, eye.normalized());
+    center_projected = (eye.length() - dist) * eye.normalized();
+    double t_star = - (eye.x() * (begin_line.x() - center_projected.x()) + eye.y() * (begin_line.y() - center_projected.y()) + eye.z() * (begin_line.z() - center_projected.z())) /
+            (eye.x() * (end_line.x() - begin_line.x()) + eye.y() * (end_line.y() - begin_line.y()) + eye.z() * (end_line.z() - begin_line.z()) );
+    QVector3D point3DonPlane3D = QVector3D(begin_line.x() + t_star * (end_line.x() - begin_line.x()),
+                                           begin_line.y() + t_star * (end_line.y() - begin_line.y()),
+                                           begin_line.z() + t_star * (end_line.z() - begin_line.z()));
+    QPoint point3DinPlane2D = QPoint(right.dotProduct(right, point3DonPlane3D), up.dotProduct(up, point3DonPlane3D));
+    return QPoint(scene.width() / 2 + point3DinPlane2D.x(), scene.height() / 2 - point3DinPlane2D.y());
 }

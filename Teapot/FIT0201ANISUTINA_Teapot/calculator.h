@@ -39,6 +39,8 @@ public:
     void scaleControl(bool);
     QImage drawSimpleTeapot();
     void setDistanceToPlane(int);
+    void drawRib(QVector3D, QVector3D);
+    QPoint lineCrossPlane(QVector3D, QVector3D);
 
 public slots:
     void updateProjection(QString);
