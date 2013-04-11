@@ -15,6 +15,40 @@
   </property>
   <widget class="QWidget" name="centralWidget">
    <layout class="QGridLayout" name="gridLayout">
+    <item row="0" column="0" colspan="6">
+     <widget class="TeapotProjectorWidget" name="teapotWg" native="true"/>
+    </item>
+    <item row="2" column="0">
+     <widget class="QLabel" name="distanceLbl">
+      <property name="text">
+       <string>distance</string>
+      </property>
+     </widget>
+    </item>
+    <item row="1" column="0">
+     <widget class="QCheckBox" name="axisFlag">
+      <property name="text">
+       <string>axis</string>
+      </property>
+      <property name="checked">
+       <bool>true</bool>
+      </property>
+     </widget>
+    </item>
+    <item row="3" column="1">
+     <widget class="QLabel" name="distanceValueLbl">
+      <property name="text">
+       <string>153</string>
+      </property>
+     </widget>
+    </item>
+    <item row="2" column="3">
+     <widget class="QLabel" name="segmentsLbl">
+      <property name="text">
+       <string>segments</string>
+      </property>
+     </widget>
+    </item>
     <item row="1" column="5" rowspan="3">
      <widget class="QListWidget" name="modelsList">
       <property name="sizePolicy">
@@ -31,12 +65,37 @@
       </property>
      </widget>
     </item>
-    <item row="2" column="3">
-     <widget class="QLabel" name="segmentsLbl">
+    <item row="3" column="4">
+     <widget class="QLabel" name="segmentNumberLbl">
+      <property name="maximumSize">
+       <size>
+        <width>16777215</width>
+        <height>10</height>
+       </size>
+      </property>
       <property name="text">
-       <string>segments</string>
+       <string>0</string>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignCenter</set>
       </property>
      </widget>
+    </item>
+    <item row="2" column="2">
+     <spacer name="horizontalSpacer">
+      <property name="orientation">
+       <enum>Qt::Horizontal</enum>
+      </property>
+      <property name="sizeType">
+       <enum>QSizePolicy::Fixed</enum>
+      </property>
+      <property name="sizeHint" stdset="0">
+       <size>
+        <width>40</width>
+        <height>20</height>
+       </size>
+      </property>
+     </spacer>
     </item>
     <item row="2" column="1">
      <widget class="QSlider" name="distanceSlider">
@@ -60,62 +119,6 @@
       </property>
      </widget>
     </item>
-    <item row="2" column="2">
-     <spacer name="horizontalSpacer">
-      <property name="orientation">
-       <enum>Qt::Horizontal</enum>
-      </property>
-      <property name="sizeType">
-       <enum>QSizePolicy::Fixed</enum>
-      </property>
-      <property name="sizeHint" stdset="0">
-       <size>
-        <width>40</width>
-        <height>20</height>
-       </size>
-      </property>
-     </spacer>
-    </item>
-    <item row="1" column="0">
-     <widget class="QCheckBox" name="axisFlag">
-      <property name="text">
-       <string>axis</string>
-      </property>
-      <property name="checked">
-       <bool>true</bool>
-      </property>
-     </widget>
-    </item>
-    <item row="2" column="0">
-     <widget class="QLabel" name="distanceLbl_2">
-      <property name="text">
-       <string>distance</string>
-      </property>
-     </widget>
-    </item>
-    <item row="3" column="4">
-     <widget class="QLabel" name="segmentNumberLbl">
-      <property name="maximumSize">
-       <size>
-        <width>16777215</width>
-        <height>10</height>
-       </size>
-      </property>
-      <property name="text">
-       <string>0</string>
-      </property>
-      <property name="alignment">
-       <set>Qt::AlignCenter</set>
-      </property>
-     </widget>
-    </item>
-    <item row="3" column="1">
-     <widget class="QLabel" name="distanceLbl">
-      <property name="text">
-       <string>153</string>
-      </property>
-     </widget>
-    </item>
     <item row="2" column="4">
      <widget class="QSlider" name="segmentNumerSlider">
       <property name="maximum">
@@ -126,13 +129,43 @@
       </property>
      </widget>
     </item>
-    <item row="0" column="0" colspan="6">
-     <widget class="TeapotProjectorWidget" name="teapotWg" native="true"/>
-    </item>
     <item row="1" column="1">
      <widget class="QCheckBox" name="boxFlag">
       <property name="text">
        <string>box</string>
+      </property>
+     </widget>
+    </item>
+    <item row="4" column="0">
+     <widget class="QLabel" name="deltaRmoveLbl">
+      <property name="minimumSize">
+       <size>
+        <width>0</width>
+        <height>10</height>
+       </size>
+      </property>
+      <property name="maximumSize">
+       <size>
+        <width>16777215</width>
+        <height>10</height>
+       </size>
+      </property>
+      <property name="text">
+       <string>delta removal</string>
+      </property>
+     </widget>
+    </item>
+    <item row="4" column="1">
+     <widget class="QLabel" name="deltaRmoveValueLbl">
+      <property name="text">
+       <string>0.0</string>
+      </property>
+     </widget>
+    </item>
+    <item row="1" column="4">
+     <widget class="QCheckBox" name="scale_flag">
+      <property name="text">
+       <string>use x1000 scaled model</string>
       </property>
      </widget>
     </item>
@@ -169,7 +202,7 @@
   <connection>
    <sender>distanceSlider</sender>
    <signal>sliderMoved(int)</signal>
-   <receiver>distanceLbl</receiver>
+   <receiver>distanceValueLbl</receiver>
    <slot>setNum(int)</slot>
    <hints>
     <hint type="sourcelabel">

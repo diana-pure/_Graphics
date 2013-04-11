@@ -14,7 +14,8 @@ Calculator::Calculator(QObject *parent) :
     scene = QImage(scene_size, QImage::Format_RGB888);
     NUM_SEGMENTS = 1;
     scene_size = QSize(600, 400);
-    eye = QVector3D(153, 0, 0);
+    //eye = QVector3D(153, 0, 0);
+    eye = QVector3D(300, 0, 0);
     up = QVector3D(0, 0, 1);
     alpha = 1.0;
     beta = 1.0;
@@ -27,6 +28,7 @@ Calculator::Calculator(QObject *parent) :
     fillCoordinates();   // was every filed initialized
     center_projected = (eye.length() - dist) * eye.normalized();
     abort_flag = false;
+    scale1000_on = false;
 }
 Calculator::~Calculator() {
     mutex.lock();
@@ -50,11 +52,15 @@ void Calculator::fillCoordinates() {
         for(int j = 0; j < (dimension1 + 1) * (dimension2 + 1); j++) {
             double x = 0.0, y = 0.0, z = 0.0;
             source >> x >> y >> z;
-            //point_set.append(QVector3D(x * 30, y * 30, z * 30));
-            point_set.append(QVector3D(x, y, z));
+            if(scale1000_on) {
+                point_set.append(QVector3D(x * 10, y * 10, z * 10));
+            } else {
+                point_set.append(QVector3D(x, y, z));
+            }
         }
     }
     model_was_changed = false;
+    scale_was_changed = false;
     file.close();
     for_box.clear();
     QVector3D pnt(0.0, 0.0, 0.0);
@@ -66,7 +72,7 @@ void Calculator::run()
 {
     while(true) {
 
-    if(model_was_changed) {
+    if(model_was_changed || scale_was_changed) {
         fillCoordinates();
     }
     mutex.lock();
@@ -328,50 +334,46 @@ void Calculator::projectModel()
 void Calculator::setStartPoint(QPoint pnt) {
     QMutexLocker locker(&mutex);
     start_point = pnt;
-    //break_flag = true;
 }
 void Calculator::setEndPoint(QPoint pnt) {
     QMutexLocker locker(&mutex);
     end_point = pnt;
-    //break_flag = true;
 }
 void Calculator::setSceneSize(QSize sz) {
     QMutexLocker locker(&mutex);
     scene_size = sz;
-    //break_flag = true;
 }
 void Calculator::setSegmentNum(int num) {
     QMutexLocker locker(&mutex);
     NUM_SEGMENTS = (0 == num) ? 1 : num;
-    //break_flag = true;
 }
 void Calculator::setCameraPosition(int dst) {
     QMutexLocker locker(&mutex);
      eye = dst * eye.normalized();
-    //break_flag = true;
 }
 void Calculator::moveCameraPosition(double dst) {
     QMutexLocker locker(&mutex);
     if(qAbs(eye.length() - dst) > 0) {
         eye = (eye.length() - dst) * eye.normalized();
     }
-//    break_flag = true;
 }
 void Calculator::axisControl(bool flag) {
     QMutexLocker locker(&mutex);
     draw_axis_on = flag;
-  //  break_flag = true;
 }
 void Calculator::boxControl(bool flag) {
     QMutexLocker locker(&mutex);
     draw_box_on = flag;
- //   break_flag = true;
+}
+void Calculator::scaleControl(bool flag) {
+    QMutexLocker locker(&mutex);
+    scale1000_on = flag;
+    scale_was_changed = true;
 }
 void Calculator::updateProjection(QString name) {
     QMutexLocker locker(&mutex);
     filename = name;
     model_was_changed = true;
-   // break_flag = true;
 }
 
 void Calculator::drawLine(QPoint pnt1, QPoint pnt2, QRgb clr) {

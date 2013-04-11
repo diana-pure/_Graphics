@@ -30,6 +30,7 @@ void TeapotProjectorWidget::mouseMoveEvent(QMouseEvent *e) {
 }
 void TeapotProjectorWidget::wheelEvent(QWheelEvent *e) {
     double numDegrees = e->delta() / 32.0;
+    emit moveCamera(numDegrees);
     calculator.moveCameraPosition(numDegrees);
     calculator.projectModel();
 }
@@ -63,6 +64,10 @@ void TeapotProjectorWidget::axisControl(bool flag) {
 }
 void TeapotProjectorWidget::boxControl(bool flag) {
     calculator.boxControl(flag);
+    calculator.projectModel();
+}
+void TeapotProjectorWidget::scaleControl(bool flag) {
+    calculator.scaleControl(flag);
     calculator.projectModel();
 }
 void TeapotProjectorWidget::updateProjection(QString filename) {

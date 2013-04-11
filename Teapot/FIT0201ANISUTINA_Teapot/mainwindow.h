@@ -25,6 +25,8 @@ private slots:
 
     void on_boxFlag_clicked();
 
+    void on_scale_flag_clicked();
+
 private:
     Ui::MainWindow *ui;
     QStringList files_names;

@@ -26,12 +26,16 @@ public:
     void setSceneSize(QSize);
     void axisControl(bool);
     void boxControl(bool);
+    void scaleControl(bool);
 
 public slots:
     void redrawProjection(QImage);
     void changeSegmentNumber(int);
     void changeDistance(int);
     void updateProjection(QString);
+
+signals:
+    void moveCamera(double);
     
 private:
     Ui::TeapotProjectorWidget *ui;
