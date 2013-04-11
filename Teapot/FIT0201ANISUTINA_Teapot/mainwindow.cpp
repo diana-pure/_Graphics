@@ -12,6 +12,7 @@ MainWindow::MainWindow(QWidget *parent) :
     loadListOfFiles();
     connect(ui->segmentNumerSlider, SIGNAL(valueChanged(int)), ui->teapotWg, SLOT(changeSegmentNumber(int)));
     connect(ui->distanceSlider, SIGNAL(valueChanged(int)), ui->teapotWg, SLOT(changeDistance(int)));
+    connect(ui->distanceToPlaneSlider, SIGNAL(valueChanged(int)), ui->teapotWg, SLOT(changeDistanceToPlane(int)));
     connect(ui->modelsList, SIGNAL(currentTextChanged(QString)), ui->teapotWg, SLOT(updateProjection(QString)));
     connect(ui->teapotWg, SIGNAL(moveCamera(double)), ui->deltaRmoveValueLbl, SLOT(setNum(double)));
 }

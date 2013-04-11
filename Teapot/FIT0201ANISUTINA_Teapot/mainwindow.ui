@@ -19,9 +19,18 @@
      <widget class="TeapotProjectorWidget" name="teapotWg" native="true"/>
     </item>
     <item row="2" column="0">
-     <widget class="QLabel" name="distanceLbl">
+     <widget class="QLabel" name="radiusLbl">
+      <property name="toolTip">
+       <string notr="true" comment="from camera to center" extracomment="from camera to center"/>
+      </property>
+      <property name="statusTip">
+       <string notr="true" comment="from camera to center" extracomment="from camera to center"/>
+      </property>
+      <property name="whatsThis">
+       <string comment="from camera to center" extracomment="from camera to center"/>
+      </property>
       <property name="text">
-       <string>distance</string>
+       <string comment="from camera to center" extracomment="from camera to center">radius</string>
       </property>
      </widget>
     </item>
@@ -35,13 +44,6 @@
       </property>
      </widget>
     </item>
-    <item row="3" column="1">
-     <widget class="QLabel" name="distanceValueLbl">
-      <property name="text">
-       <string>153</string>
-      </property>
-     </widget>
-    </item>
     <item row="2" column="3">
      <widget class="QLabel" name="segmentsLbl">
       <property name="text">
@@ -49,35 +51,10 @@
       </property>
      </widget>
     </item>
-    <item row="1" column="5" rowspan="3">
-     <widget class="QListWidget" name="modelsList">
-      <property name="sizePolicy">
-       <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-        <horstretch>0</horstretch>
-        <verstretch>0</verstretch>
-       </sizepolicy>
-      </property>
-      <property name="maximumSize">
-       <size>
-        <width>85</width>
-        <height>75</height>
-       </size>
-      </property>
-     </widget>
-    </item>
-    <item row="3" column="4">
-     <widget class="QLabel" name="segmentNumberLbl">
-      <property name="maximumSize">
-       <size>
-        <width>16777215</width>
-        <height>10</height>
-       </size>
-      </property>
+    <item row="1" column="4">
+     <widget class="QCheckBox" name="scale_flag">
       <property name="text">
-       <string>0</string>
-      </property>
-      <property name="alignment">
-       <set>Qt::AlignCenter</set>
+       <string>use x1000 scaled model</string>
       </property>
      </widget>
     </item>
@@ -97,13 +74,32 @@
       </property>
      </spacer>
     </item>
+    <item row="6" column="0">
+     <widget class="QLabel" name="deltaRmoveLbl">
+      <property name="minimumSize">
+       <size>
+        <width>0</width>
+        <height>10</height>
+       </size>
+      </property>
+      <property name="maximumSize">
+       <size>
+        <width>16777215</width>
+        <height>10</height>
+       </size>
+      </property>
+      <property name="text">
+       <string>delta removal</string>
+      </property>
+     </widget>
+    </item>
     <item row="2" column="1">
      <widget class="QSlider" name="distanceSlider">
       <property name="minimum">
-       <number>151</number>
+       <number>0</number>
       </property>
       <property name="maximum">
-       <number>300</number>
+       <number>500</number>
       </property>
       <property name="singleStep">
        <number>10</number>
@@ -124,6 +120,9 @@
       <property name="maximum">
        <number>32</number>
       </property>
+      <property name="sliderPosition">
+       <number>1</number>
+      </property>
       <property name="orientation">
        <enum>Qt::Horizontal</enum>
       </property>
@@ -136,14 +135,47 @@
       </property>
      </widget>
     </item>
-    <item row="4" column="0">
-     <widget class="QLabel" name="deltaRmoveLbl">
-      <property name="minimumSize">
+    <item row="6" column="1">
+     <widget class="QLabel" name="deltaRmoveValueLbl">
+      <property name="text">
+       <string>0.0</string>
+      </property>
+     </widget>
+    </item>
+    <item row="1" column="5" rowspan="5">
+     <widget class="QListWidget" name="modelsList">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+      <property name="maximumSize">
        <size>
-        <width>0</width>
-        <height>10</height>
+        <width>85</width>
+        <height>75</height>
        </size>
       </property>
+     </widget>
+    </item>
+    <item row="4" column="1">
+     <widget class="QSlider" name="distanceToPlaneSlider">
+      <property name="minimum">
+       <number>10</number>
+      </property>
+      <property name="maximum">
+       <number>200</number>
+      </property>
+      <property name="sliderPosition">
+       <number>150</number>
+      </property>
+      <property name="orientation">
+       <enum>Qt::Horizontal</enum>
+      </property>
+     </widget>
+    </item>
+    <item row="4" column="0">
+     <widget class="QLabel" name="distanceToPlaneLbl">
       <property name="maximumSize">
        <size>
         <width>16777215</width>
@@ -151,21 +183,49 @@
        </size>
       </property>
       <property name="text">
-       <string>delta removal</string>
+       <string extracomment="from camera to plane">distance</string>
       </property>
      </widget>
     </item>
-    <item row="4" column="1">
-     <widget class="QLabel" name="deltaRmoveValueLbl">
+    <item row="3" column="1">
+     <widget class="QLabel" name="distanceValueLbl">
+      <property name="maximumSize">
+       <size>
+        <width>16777215</width>
+        <height>10</height>
+       </size>
+      </property>
       <property name="text">
-       <string>0.0</string>
+       <string>153</string>
       </property>
      </widget>
     </item>
-    <item row="1" column="4">
-     <widget class="QCheckBox" name="scale_flag">
+    <item row="5" column="1">
+     <widget class="QLabel" name="distanceToPlaneValueLbl">
+      <property name="maximumSize">
+       <size>
+        <width>16777215</width>
+        <height>10</height>
+       </size>
+      </property>
       <property name="text">
-       <string>use x1000 scaled model</string>
+       <string>150</string>
+      </property>
+     </widget>
+    </item>
+    <item row="3" column="4">
+     <widget class="QLabel" name="segmentNumberLbl">
+      <property name="maximumSize">
+       <size>
+        <width>16777215</width>
+        <height>10</height>
+       </size>
+      </property>
+      <property name="text">
+       <string>1</string>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignCenter</set>
       </property>
      </widget>
     </item>
@@ -190,12 +250,12 @@
    <slot>setNum(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>316</x>
-     <y>361</y>
+     <x>499</x>
+     <y>311</y>
     </hint>
     <hint type="destinationlabel">
-     <x>443</x>
-     <y>380</y>
+     <x>499</x>
+     <y>371</y>
     </hint>
    </hints>
   </connection>
@@ -206,12 +266,28 @@
    <slot>setNum(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>171</x>
-     <y>366</y>
+     <x>237</x>
+     <y>311</y>
     </hint>
     <hint type="destinationlabel">
-     <x>173</x>
-     <y>387</y>
+     <x>237</x>
+     <y>327</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>distanceToPlaneSlider</sender>
+   <signal>sliderMoved(int)</signal>
+   <receiver>distanceToPlaneValueLbl</receiver>
+   <slot>setNum(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>148</x>
+     <y>341</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>148</x>
+     <y>363</y>
     </hint>
    </hints>
   </connection>

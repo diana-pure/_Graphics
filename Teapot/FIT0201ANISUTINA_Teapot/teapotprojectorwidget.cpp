@@ -52,12 +52,14 @@ void TeapotProjectorWidget::changeSegmentNumber(int num) {
     calculator.setSegmentNum(num);
     calculator.projectModel();
 }
-
 void TeapotProjectorWidget::changeDistance(int dst) {
     calculator.setCameraPosition(dst);
     calculator.projectModel();
 }
-
+void TeapotProjectorWidget::changeDistanceToPlane(int dst) {
+    calculator.setDistanceToPlane(dst);
+    calculator.projectModel();
+}
 void TeapotProjectorWidget::axisControl(bool flag) {
     calculator.axisControl(flag);
     calculator.projectModel();

@@ -37,6 +37,8 @@ public:
     void drawBox();
     void boxControl(bool);
     void scaleControl(bool);
+    QImage drawSimpleTeapot();
+    void setDistanceToPlane(int);
 
 public slots:
     void updateProjection(QString);

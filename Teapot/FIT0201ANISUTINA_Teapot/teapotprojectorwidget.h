@@ -33,6 +33,7 @@ public slots:
     void changeSegmentNumber(int);
     void changeDistance(int);
     void updateProjection(QString);
+    void changeDistanceToPlane(int);
 
 signals:
     void moveCamera(double);
