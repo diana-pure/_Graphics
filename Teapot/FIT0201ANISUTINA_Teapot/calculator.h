@@ -72,18 +72,18 @@ private:
     int dimension2;
     qreal dist;
     QRgb teapot_color;
-    QMutex mutex;
     bool draw_axis_on;
     bool draw_box_on;
+    bool scale1000_on;
     bool break_flag;
-    QString filename;
+    bool abort_flag;
     bool model_was_changed;
     bool scale_was_changed;
     QVector3D center_projected;
     QVector<QVector3D> for_box;
+    QString filename;
+    QMutex mutex;
     QWaitCondition condition;
-    bool abort_flag;
-    bool scale1000_on;
 };
 
 #endif // CALCULATOR_H
