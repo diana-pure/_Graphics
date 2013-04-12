@@ -117,7 +117,6 @@ void Calculator::run() {
                 //vertical lines
                 for(double u = 0.0; u <= 1.0; u += STEP_discr) {
                     // get control points for bezier curve
-                    //draw bezier curve
                     bzr_crv_ctrl_pnts.clear();
                     for(int j = 0; j <= dimension2; j++) {
                         QVector3D curve_point(0, 0, 0);
@@ -127,6 +126,7 @@ void Calculator::run() {
                         bzr_crv_ctrl_pnts.append(curve_point);
                         curve_point = QVector3D(0, 0, 0);
                     }
+                    //draw bezier curve
                     for(double v = 0.0; v <= 1.0; v += STEP_contin) {
                         QVector3D surf_point(0, 0, 0);
                             for(int j = 0; j <= dimension2; j++) {
@@ -142,7 +142,6 @@ void Calculator::run() {
                 //horisontal lines
                 for(double v = 0.0; v <= 1.0; v += STEP_discr) {
                     // get control points for bezier curve
-                    //draw bezier curve
                     bzr_crv_ctrl_pnts.clear();
                     for(int i = 0; i <= dimension1; i++) {
                         QVector3D curve_point(0, 0, 0);
@@ -152,6 +151,7 @@ void Calculator::run() {
                         bzr_crv_ctrl_pnts.append(curve_point);
                         curve_point = QVector3D(0, 0, 0);
                     }
+                    //draw bezier curve
                     for(double u = 0.0; u <= 1.0; u += STEP_contin) {
                         QVector3D surf_point(0, 0, 0);
                             for(int i = 0; i <= dimension1; i++) {

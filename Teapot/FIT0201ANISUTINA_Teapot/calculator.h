@@ -67,6 +67,7 @@ private:
     float beta;
     QVector<QVector3D> point_set;
     QVector<QVector3D> bzr_crv_ctrl_pnts;
+    QVector<QVector3D> bezier_surf;
     int patch_number;
     int dimension1;
     int dimension2;
