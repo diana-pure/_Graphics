@@ -23,6 +23,9 @@ public:
     void setPixelSafe(int, int, QRgb);
     void setPixelSafe(QPoint, QRgb);
     void redrawScene();
+    void drawLine(QPoint, QPoint, QRgb);
+    void drawHLine(QPoint, QPoint, QRgb);
+    void drawVLine(QPoint, QPoint, QRgb);
 
 private slots:
     void on_fPointSlider_sliderMoved(int position);
