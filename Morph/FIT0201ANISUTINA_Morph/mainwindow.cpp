@@ -1,6 +1,7 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include <QPainter>
+#include <QDebug>
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -8,6 +9,11 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->setupUi(this);
     scene = QImage(600, 400, QImage::Format_RGB888);
     redrawScene();
+    baseTexture = QImage(":/baseTexture.png");
+    texel = QSize(4, 4);
+
+    fillMatrix(0, 256);
+    gausSolver();
 }
 
 MainWindow::~MainWindow() {
@@ -20,7 +26,7 @@ void MainWindow::paintEvent(QPaintEvent *) {
 }
 
 void MainWindow::resizeEvent(QResizeEvent *e) {
-    scene = QImage(e->size().width(), e->size().height() - 40, QImage::Format_RGB888);
+    scene = QImage(e->size().width() - 90, e->size().height() - 40, QImage::Format_RGB888);
     clearScene();
     redrawScene();
 }
@@ -64,6 +70,16 @@ void MainWindow::setPixelSafe(int x_coord, int y_coord, QRgb color) {
     scene.setPixel(x_coord, y_coord, color);
 }
 
+bool MainWindow::pixelSafe(int x_coord, int y_coord, int image_width, int image_height) {
+    if((0 > x_coord) || (image_width - 1 < x_coord)) {
+        return false;
+    }
+    if((0 > y_coord) || (image_height - 1 < y_coord)) {
+        return false;
+    }
+    return true;
+}
+
 void MainWindow::setPixelSafe(QPoint pnt, QRgb color) {
     setPixelSafe(pnt.x(), pnt.y(), color);
 }
@@ -87,6 +103,7 @@ void MainWindow::redrawScene() {
     drawLine(d_point, e_point, QColor(0, 0, 0).rgba());
     drawLine(e_point, f_point_current, QColor(0, 0, 0).rgba());
     drawLine(f_point_current, a_point, QColor(0, 0, 0).rgba());
+    renderingTexturedImage();
     update();
 }
 
@@ -139,4 +156,192 @@ void MainWindow::drawVLine(QPoint pnt1, QPoint pnt2, QRgb clr) {
     for(int i = pnt1.y(); i < pnt2.y(); i ++) {
         setPixelSafe(QPoint(pnt1.x(), i), clr);
     }
+}
+
+void MainWindow::renderingTexturedImage() {
+    //bypass every inner point
+    //setPixel(i, j, layerNearestFilter(i, j))
+    for(int i = a_point.x(); i < b_point.x(); i++) {
+        for(int j = a_point.y(); j < d_point.y(); j++) {
+            QRgb color = layerNearestFilter(i - a_point.x(), j - a_point.y());
+            setPixelSafe(i, j, color);
+        }
+    }
+/*
+    for(int i = a_point.x(); i < b_point.x(); i++) {
+        for(int j = a_point.y(); j < d_point.y(); j++) {
+            QRgb color = layerLinearFilter(i - a_point.x(), j - a_point.y());
+            setPixelSafe(i, j, color);
+        }
+    }
+    */
+}
+
+QRgb MainWindow::layerNearestFilter(int horz_coord, int vert_coord) {
+    int x_coord = horz_coord * texel.width() + texel.width() / 2;
+    int y_coord = vert_coord * texel.height() + texel.height() / 2;
+    if (pixelSafe(x_coord, y_coord, baseTexture.width(), baseTexture.height())) {
+        return baseTexture.pixel(x_coord, y_coord);
+    }
+   return 0;//QRgb(0, 0, 0); // is it ok?
+}
+
+QRgb MainWindow::layerLinearFilter(int horz_coord, int vert_coord) {
+    QPoint A_texel = QPoint((horz_coord ) * (texel.width() * 4), (vert_coord ) * (texel.height() * 4));
+    QPoint B_texel = QPoint(A_texel.x() + texel.width(), A_texel.y());
+    QPoint C_texel = QPoint(A_texel.x(), A_texel.y() + texel.height());
+    QPoint D_texel = QPoint(A_texel.x() + texel.width(), A_texel.y() + texel.height());
+    int a_distance = horz_coord % (texel.width() * 4) - (A_texel.x() + texel.width() / 2);
+    int b_distance = vert_coord % (texel.height() * 4) - (A_texel.y() + texel.height() / 2);
+    QRgb M_color = (1.0 - a_distance / static_cast<double>(texel.width())) * baseTexture.pixel(A_texel.x() + texel.width() / 2, A_texel.y() + texel.height() / 2) +
+            (a_distance / static_cast<double>(texel.width())) * baseTexture.pixel(B_texel.x() + texel.width() / 2, B_texel.y() + texel.height() / 2);
+    QRgb N_color = (1.0 - a_distance / static_cast<double>(texel.width())) * baseTexture.pixel(C_texel.x() + texel.width() / 2, C_texel.y() + texel.height() / 2) +
+            (a_distance / static_cast<double>(texel.width())) * baseTexture.pixel(D_texel.x() + texel.width() / 2, D_texel.y() + texel.height() / 2);
+    return (1.0 - b_distance / static_cast<double>(texel.height())) * M_color + b_distance / static_cast<double>(texel.height()) * N_color;
+
+
+    return baseTexture.pixel(horz_coord / texel.width() + texel.width() / 2, vert_coord / texel.height() + texel.height() / 2);
+}
+
+void MainWindow::gausSolver() {
+
+    //QVector<int> num_rows = QVector<int>(slae.size(), 0);
+    int num_rows = 0;
+    //1st pass to make upper triangular matrix
+    for(int i = 0; i < slae.size(); i++) {
+        QVector<QVector<qreal> > reordered_slae;
+        //get up rows which has <> 0 element on i place
+        for(int k = 0; k < i; k++) {
+            reordered_slae.push_back(slae[k]);
+            qDebug() << slae[k];
+        }
+        for(int k = i; k < slae.size(); k++) {
+            if(0 != slae[k][i]) {
+                reordered_slae.push_back(slae[k]);
+                num_rows++;
+                qDebug() << slae[k];
+            }
+        }
+        for(int k = i; k < slae.size(); k++) {
+            if(0 == slae[k][i]) {
+                reordered_slae.push_back(slae[k]);
+                qDebug() << slae[k];
+            }
+        }
+        qDebug() << "=======";
+        slae = reordered_slae;
+        if(0 == slae[i][i]) {
+            for(int j = i + 1; j < slae.size(); j++) { //i+1
+                if(0 != slae.at(j).at(i)) {
+                    slae[i].swap(slae[j]);
+                    break;
+                }
+            }
+        }
+        if(0 == slae.at(i).at(i)) {
+            slae[i].swap(slae[i + 1]);
+        }
+        qreal divisor = slae[i][i];
+        if(0.0 != divisor) {
+        for(int j = i; j < slae[i].size(); j++) { //i
+            slae[i][j] /= divisor;
+        }
+        } else {
+            qDebug() << "divisor is 0" << i;
+
+        }
+        for(int k = i + 1; k < slae.size(); k++) {
+            qreal multiplier = slae[k][i];
+            for(int l = i; l < slae[k].size(); l++) {   //i
+                slae[k][l] -= slae[i][l] * multiplier;
+            }
+        }
+    }
+    //back pass to make the identity matrix
+    for(int i = slae.size() - 1; i > 0; i--) {
+        for(int j = i - 1; j >= 0; j--) {
+            qreal multiplier = slae[j][i];
+            slae[j][slae[j].size() - 1] -= slae[i][slae[i].size() - 1] * multiplier;
+            slae[j][i] = 0.0;
+        }
+    }
+    for(int i = 0; i < slae.size(); i++) {
+        qDebug() << slae[i][slae[i].size() - 1];
+    }
+    return;
+}
+
+void MainWindow::fillMatrix(int x1_star, int x2_star) {
+
+    QVector<qreal> rowMatrix = QVector<qreal>(9, 0.0);
+    rowMatrix.replace(2, 1.0);
+    slae.append(rowMatrix);
+
+    rowMatrix = QVector<qreal>(9, 0.0);
+    rowMatrix.replace(5, 1.0);
+    slae.append(rowMatrix);
+
+    rowMatrix = QVector<qreal>(9, 0.0);
+    rowMatrix.replace(0, 256.0);
+    rowMatrix.replace(2, 1.0);
+    rowMatrix.replace(6, -256.0);
+    rowMatrix.replace(8, 1.0);
+    slae.append(rowMatrix);
+
+    rowMatrix = QVector<qreal>(9, 0.0);
+    rowMatrix.replace(3, 256.0);
+    rowMatrix.replace(5, 1.0);
+    slae.append(rowMatrix);
+
+    rowMatrix = QVector<qreal>(9, 0.0);
+    rowMatrix.replace(0, static_cast<qreal>(x1_star));
+    rowMatrix.replace(1, 128.0);
+    rowMatrix.replace(2, 1.0);
+    slae.append(rowMatrix);
+
+    rowMatrix = QVector<qreal>(9, 0.0);
+    rowMatrix.replace(3, static_cast<qreal>(x1_star));
+    rowMatrix.replace(4, 128.0);
+    rowMatrix.replace(5, 1.0);
+    rowMatrix.replace(6, -0.5 * static_cast<qreal>(x1_star));
+    rowMatrix.replace(7, -64.0);
+    rowMatrix.replace(8, 0.5);
+    slae.append(rowMatrix);
+
+    rowMatrix = QVector<qreal>(9, 0.0);
+    rowMatrix.replace(0, static_cast<qreal>(x2_star));
+    rowMatrix.replace(1, 128.0);
+    rowMatrix.replace(2, 1.0);
+    rowMatrix.replace(6, -static_cast<qreal>(x2_star));
+    rowMatrix.replace(7, -128.0);
+    rowMatrix.replace(8, 1.0);
+    slae.append(rowMatrix);
+
+    rowMatrix = QVector<qreal>(9, 0.0);
+    rowMatrix.replace(3, static_cast<qreal>(x2_star));
+    rowMatrix.replace(4, 128.0);
+    rowMatrix.replace(5, 1.0);
+    rowMatrix.replace(6, -0.5 * static_cast<qreal>(x2_star));
+    rowMatrix.replace(7, -64.0);
+    rowMatrix.replace(8, 0.5);
+    slae.append(rowMatrix);
+
+/*
+    QVector<qreal> rowMatrix;
+    rowMatrix.append(2.0);
+    rowMatrix.append(1.0);
+    rowMatrix.append(1.0);
+    rowMatrix.append(1.0);
+    rowMatrix.append(1.0);
+    rowMatrix.append(1.0);
+    rowMatrix.append(1.0);
+    rowMatrix.append(1.0);
+    rowMatrix.append(9.0);
+    slae.append(rowMatrix);
+    for(int i = 1; i < 8; i++) {
+        rowMatrix.replace(i, 2.0);
+        rowMatrix.replace(i - 1, 1.0);
+        slae.append(rowMatrix);
+    }
+*/
 }
