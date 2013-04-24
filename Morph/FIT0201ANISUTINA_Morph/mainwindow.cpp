@@ -205,54 +205,27 @@ QRgb MainWindow::layerLinearFilter(int horz_coord, int vert_coord) {
 
 void MainWindow::gausSolver() {
 
-    //QVector<int> num_rows = QVector<int>(slae.size(), 0);
-    int num_rows = 0;
     //1st pass to make upper triangular matrix
     for(int i = 0; i < slae.size(); i++) {
-        QVector<QVector<qreal> > reordered_slae;
-        //get up rows which has <> 0 element on i place
-        for(int k = 0; k < i; k++) {
-            reordered_slae.push_back(slae[k]);
-            qDebug() << slae[k];
-        }
-        for(int k = i; k < slae.size(); k++) {
-            if(0 != slae[k][i]) {
-                reordered_slae.push_back(slae[k]);
-                num_rows++;
-                qDebug() << slae[k];
-            }
-        }
-        for(int k = i; k < slae.size(); k++) {
-            if(0 == slae[k][i]) {
-                reordered_slae.push_back(slae[k]);
-                qDebug() << slae[k];
-            }
-        }
-        qDebug() << "=======";
-        slae = reordered_slae;
         if(0 == slae[i][i]) {
-            for(int j = i + 1; j < slae.size(); j++) { //i+1
-                if(0 != slae.at(j).at(i)) {
+            for(int j = i + 1 ; j < slae.size(); j++) { //i+1
+                if(slae[j][i] != 0) {
                     slae[i].swap(slae[j]);
                     break;
                 }
             }
         }
-        if(0 == slae.at(i).at(i)) {
-            slae[i].swap(slae[i + 1]);
-        }
         qreal divisor = slae[i][i];
         if(0.0 != divisor) {
-        for(int j = i; j < slae[i].size(); j++) { //i
+        for(int j = i; j < slae[i].size(); j++) {
             slae[i][j] /= divisor;
         }
         } else {
             qDebug() << "divisor is 0" << i;
-
         }
         for(int k = i + 1; k < slae.size(); k++) {
             qreal multiplier = slae[k][i];
-            for(int l = i; l < slae[k].size(); l++) {   //i
+            for(int l = i; l < slae[k].size(); l++) {
                 slae[k][l] -= slae[i][l] * multiplier;
             }
         }
@@ -300,12 +273,12 @@ void MainWindow::fillMatrix(int x1_star, int x2_star) {
     slae.append(rowMatrix);
 
     rowMatrix = QVector<qreal>(9, 0.0);
-    rowMatrix.replace(3, static_cast<qreal>(x1_star));
-    rowMatrix.replace(4, 128.0);
-    rowMatrix.replace(5, 1.0);
-    rowMatrix.replace(6, -0.5 * static_cast<qreal>(x1_star));
-    rowMatrix.replace(7, -64.0);
-    rowMatrix.replace(8, 0.5);
+    rowMatrix.replace(3, 2 * static_cast<qreal>(x1_star));
+    rowMatrix.replace(4, 256.0);
+    rowMatrix.replace(5, 2.0);
+    rowMatrix.replace(6, -static_cast<qreal>(x1_star));
+    rowMatrix.replace(7, -128.0);
+    rowMatrix.replace(8, 1.0);
     slae.append(rowMatrix);
 
     rowMatrix = QVector<qreal>(9, 0.0);
@@ -318,30 +291,11 @@ void MainWindow::fillMatrix(int x1_star, int x2_star) {
     slae.append(rowMatrix);
 
     rowMatrix = QVector<qreal>(9, 0.0);
-    rowMatrix.replace(3, static_cast<qreal>(x2_star));
-    rowMatrix.replace(4, 128.0);
-    rowMatrix.replace(5, 1.0);
-    rowMatrix.replace(6, -0.5 * static_cast<qreal>(x2_star));
-    rowMatrix.replace(7, -64.0);
-    rowMatrix.replace(8, 0.5);
+    rowMatrix.replace(3, 2 * static_cast<qreal>(x2_star));
+    rowMatrix.replace(4, 256.0);
+    rowMatrix.replace(5, 2.0);
+    rowMatrix.replace(6, -static_cast<qreal>(x2_star));
+    rowMatrix.replace(7, -128.0);
+    rowMatrix.replace(8, 1.0);
     slae.append(rowMatrix);
-
-/*
-    QVector<qreal> rowMatrix;
-    rowMatrix.append(2.0);
-    rowMatrix.append(1.0);
-    rowMatrix.append(1.0);
-    rowMatrix.append(1.0);
-    rowMatrix.append(1.0);
-    rowMatrix.append(1.0);
-    rowMatrix.append(1.0);
-    rowMatrix.append(1.0);
-    rowMatrix.append(9.0);
-    slae.append(rowMatrix);
-    for(int i = 1; i < 8; i++) {
-        rowMatrix.replace(i, 2.0);
-        rowMatrix.replace(i - 1, 1.0);
-        slae.append(rowMatrix);
-    }
-*/
 }
