@@ -221,32 +221,45 @@ QRgb MainWindow::layerLinearFilter(qreal horz_coord1, qreal vert_coord1) {
     int dist_h = vert_coord % texel.height();
     double a_distance = 0.0;
     double b_distance = 0.0;
-    QPoint A_texel;
+    //QPoint nearest_texel = QPoint((horz_coord / texel.width()) * texel.width() + texel.width() / 2, (vert_coord / texel.height()) * texel.height() - texel.height() / 2);
+    QPoint A_texel = QPoint(texel.width() / 2, texel.height() / 2);
     QPoint B_texel;
     QPoint C_texel;
     QPoint D_texel;
     if((texel.width() / 2) > dist_w) {
         if((texel.height() / 2) > dist_h) {
-            A_texel = QPoint((horz_coord / texel.width()) * texel.width() - texel.width() / 2, (vert_coord / texel.height()) * texel.height() - texel.height() / 2) ;
-            a_distance = dist_w - texel.width() / 2;
+            if((0 != horz_coord / texel.width()) && (0 != horz_coord / texel.height())) {
+                A_texel = QPoint((horz_coord / texel.width()) * texel.width() - texel.width() / 2, (vert_coord / texel.height()) * texel.height() - texel.height() / 2) ;
+            }
+            a_distance = (dist_w + texel.width() / 2) / texel.width();
         } else {
-            A_texel = QPoint((horz_coord / texel.width()) * texel.width() - texel.width() / 2, (vert_coord / texel.height()) * texel.height());
-            a_distance = texel.width() / 2 - dist_w;
+            if(0 != horz_coord / texel.width()) {
+                A_texel = QPoint((horz_coord / texel.width()) * texel.width() - texel.width() / 2, (vert_coord / texel.height()) * texel.height());
+            }
+            a_distance = texel.width() - (dist_w - texel.width() / 2) / texel.width();
         }
     } else {
         if((texel.height() / 2) > dist_h) {
-            A_texel = QPoint((horz_coord / texel.width()) * texel.width(), (vert_coord / texel.height()) * texel.height() - texel.height() / 2) ;
-            b_distance = dist_h - texel.height() / 2;
+            if(0 != horz_coord / texel.height()) {
+                A_texel = QPoint((horz_coord / texel.width()) * texel.width(), (vert_coord / texel.height()) * texel.height() - texel.height() / 2) ;
+            }
+            b_distance = (dist_h + texel.height() / 2)  / texel.height();
         } else {
             A_texel = QPoint((horz_coord / texel.width()) * texel.width(), (vert_coord / texel.height()) * texel.height());
-            b_distance = texel.height() / 2 - dist_h;
+            b_distance = (texel.height() - (dist_h - texel.height() / 2) / texel.height());
         }
     }
     B_texel = QPoint(A_texel.x() + texel.width(), A_texel.y());
     C_texel = QPoint(A_texel.x(), A_texel.y() + texel.height());
     D_texel = QPoint(A_texel.x() + texel.width(), A_texel.y() + texel.height());
-    QRgb M_color = (1.0 - a_distance) * baseTexture.pixel(A_texel) + a_distance * baseTexture.pixel(B_texel);
-    QRgb N_color = (1.0 - a_distance) * baseTexture.pixel(C_texel) + a_distance * baseTexture.pixel(D_texel);
+    QRgb M_color;
+    QRgb N_color;
+    if(pixelSafe(A_texel.x(), A_texel.y(), baseTexture.width(), baseTexture.height()) && pixelSafe(B_texel.x(), B_texel.y(), baseTexture.width(), baseTexture.height())) {
+        M_color = (1.0 - a_distance) * baseTexture.pixel(A_texel) + a_distance * baseTexture.pixel(B_texel);
+    }
+    if(pixelSafe(C_texel.x(), C_texel.y(), baseTexture.width(), baseTexture.height()) && pixelSafe(D_texel.x(), D_texel.y(), baseTexture.width(), baseTexture.height())) {
+        N_color = (1.0 - a_distance) * baseTexture.pixel(C_texel) + a_distance * baseTexture.pixel(D_texel);
+    }
     return (1.0 - b_distance) * M_color + b_distance * N_color;
 }
 
