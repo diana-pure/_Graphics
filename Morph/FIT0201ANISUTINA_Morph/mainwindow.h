@@ -27,13 +27,13 @@ public:
     void drawLine(QPoint, QPoint, QRgb);
     void drawHLine(QPoint, QPoint, QRgb);
     void drawVLine(QPoint, QPoint, QRgb);
-    void renderingTexturedImage(QVector<qreal> topCoeffs, QVector<qreal> bottomCoeffs);
+    void renderingTexturedImage();//QVector<qreal> topCoeffs, QVector<qreal> bottomCoeffs);
     //QRgb layerNearestFilter(int, int);
     QRgb layerNearestFilter(qreal, qreal);
     //QRgb layerNearestFilter(QPoint);
     QRgb layerNearestFilter(QVector<qreal>);
-    QRgb layerLinearFilter(int, int);
-    QRgb layerLinearFilter(QPoint);
+    QRgb layerLinearFilter(qreal, qreal);
+    QRgb layerLinearFilter(QVector<qreal>);
     //void gausSolver();
     QVector<qreal> gausSolver(QVector<QVector<qreal> > slae);
     QVector<QVector<qreal> > fillTopMatrix(int x1_star, int x2_star);
@@ -47,10 +47,16 @@ public:
     QVector<qreal> getTexturePoint(QPoint pnt, QVector<qreal> coeffs);
     QPoint toSceneCoordinates(QPoint);
     QVector<QPoint> getPointsOfBrezenhemLine(QPoint start_line, QPoint end_line, QVector<QPoint> line);
+    void renderLayerNearestFilteredImage();//QVector<qreal> topCffs, QVector<qreal> btmCffs);
+    void renderLayerLinearFilteredImage();//QVector<qreal>, QVector<qreal>);
 
 private slots:
     void on_fPointSlider_sliderMoved(int position);
     void on_cPointSlider_sliderMoved(int position);
+
+    void on_nearestLayerBtn_clicked();
+
+    void on_linearLayerBtn_clicked();
 
 private:
     Ui::MainWindow *ui;
@@ -65,6 +71,8 @@ private:
     QPoint e_point;
     QImage baseTexture;
     QSize texel;
+    QVector<qreal> coefficientsForTopTransform;
+    QVector<qreal> coefficientsForBottomTransform;
     //QVector<qreal> coeffTransform;
     //QVector<QVector<qreal> > slae;
 };
