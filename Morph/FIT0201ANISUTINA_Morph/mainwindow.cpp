@@ -24,9 +24,8 @@ void MainWindow::paintEvent(QPaintEvent *) {
 }
 
 void MainWindow::resizeEvent(QResizeEvent *e) {
-    //scene = QImage(e->size().width() - 90, e->size().height() - 40, QImage::Format_RGB888);
-   // clearScene();
-   // redrawScene();
+    scene = QImage(e->size().width() - 90, e->size().height() - 40, QImage::Format_RGB888);
+    redrawScene();
 }
 
 void MainWindow::clearScene() {
@@ -75,14 +74,13 @@ void MainWindow::redrawScene() {
     scene.fill(QColor(255, 255, 255).rgba()); //clearScene
     drawBorders();
     QVector<qreal> coefficientsForTopTransform = gausSolver(fillTopMatrix(f_point_current, c_point_current));
-    //QVector<qreal> coefficientsBottomTopTransform = gausSolver(fillBottomMatrix(relativeCoordinates(f_point), relativeCoordinates(c_point)));
-    renderingTexturedImage(coefficientsForTopTransform);//, coefficientsForTopTransform);
+    QVector<qreal> coefficientsForBottomTransform = gausSolver(fillBottomMatrix(f_point_current, c_point_current));
+    renderingTexturedImage(coefficientsForTopTransform, coefficientsForBottomTransform);
     update();
 }
 
 void MainWindow::on_cPointSlider_sliderMoved(int position) {
     c_point_current = QPoint(c_point.x() + position, c_point.y());
-
     redrawScene();
 }
 
@@ -132,30 +130,71 @@ void MainWindow::drawVLine(QPoint pnt1, QPoint pnt2, QRgb clr) {
     }
 }
 
-void MainWindow::renderingTexturedImage(QVector<qreal> topCoeffs) {
+void MainWindow::renderingTexturedImage(QVector<qreal> topCoeffs, QVector<qreal> bottomCoeffs) {
 
     //bypass every inner point using brsenhem
     //get new 4 points
     //calc
     //setPixel(i, j, layerNearestFilter(i, j))
     // get points from brezenhem
+
+// it works! :)
+    QVector<QPoint> af_line;
+    QVector<QPoint> bc_line;
+    af_line = getPointsOfBrezenhemLine(toSceneCoordinates(a_point), toSceneCoordinates(f_point_current), af_line);
+    bc_line = getPointsOfBrezenhemLine(toSceneCoordinates(b_point), toSceneCoordinates(c_point_current), bc_line);
+    int t = 0;
+    int g = 0;
+    for(int h = 0; h < 128; h++) {
+        while (h == af_line[t + 1].y()) {
+            t++;
+        }
+        while (h == bc_line[g + 1].y()) {
+            g++;
+        }
+        for(int w = af_line[t].x(); w < bc_line[g].x(); w++) {
+            QRgb color = layerNearestFilter(getTexturePoint(QPoint(w, h), topCoeffs));
+            setPixelSafe(toSceneCoordinates(QPoint(w, h)), color);
+        }
+        t++;
+        g++;
+    }
+    QVector<QPoint> ef_line;
+    QVector<QPoint> cd_line;
+    //ef_line = getPointsOfBrezenhemLine(toSceneCoordinates(e_point), toSceneCoordinates(f_point_current), ef_line);
+    //cd_line = getPointsOfBrezenhemLine(toSceneCoordinates(d_point), toSceneCoordinates(c_point_current), cd_line);
+    ef_line = getPointsOfBrezenhemLine(toSceneCoordinates(f_point_current), toSceneCoordinates(e_point), ef_line);
+    cd_line = getPointsOfBrezenhemLine(toSceneCoordinates(c_point_current), toSceneCoordinates(d_point), cd_line);
+    t = 0;
+    g = 0;
+    for(int h = 128; h < 256; h++) {
+        while (h == ef_line[t + 1].y()) {
+            t++;
+        }
+        while (h == cd_line[g + 1].y()) {
+            g++;
+        }
+        for(int w = ef_line[t].x(); w < cd_line[g].x(); w++) {
+            QRgb color = layerNearestFilter(getTexturePoint(QPoint(w, h), bottomCoeffs));
+            setPixelSafe(toSceneCoordinates(QPoint(w, h)), color);
+        }
+        t++;
+        g++;
+    }
+
+/*
+
     QVector<QPoint> af_line;
     QVector<QPoint> bc_line;
     af_line = getPointsOfBrezenhemLine(toSceneCoordinates(a_point), toSceneCoordinates(f_point_current), af_line);
     bc_line = getPointsOfBrezenhemLine(toSceneCoordinates(b_point), toSceneCoordinates(c_point_current), bc_line);
     for(int h = 0; h < 128; h++) {
         for(int w = af_line[h].x(); w < bc_line[h].x(); w++) {
-            QRgb color = layerNearestFilter(getTexturePoint(QPoint(w, h), topCoeffs));
+            QRgb color = layerLinearFilter(getTexturePoint(QPoint(w, h), topCoeffs));
             setPixelSafe(toSceneCoordinates(QPoint(w, h)), color);
         }
     }
-
- /*   for(int i = a_point.x(); i < b_point.x(); i++) {
-        for(int j = a_point.y(); j < d_point.y(); j++) {
-            QRgb color = layerNearestFilter(getTexturePoint( i - a_point.x(), j - a_point.y());
-            setPixelSafe(i, j, color);
-        }
-    }*/
+*/
 /*
     for(int i = a_point.x(); i < b_point.x(); i++) {
         for(int j = a_point.y(); j < d_point.y(); j++) {
@@ -166,34 +205,43 @@ void MainWindow::renderingTexturedImage(QVector<qreal> topCoeffs) {
     */
 }
 
-QRgb MainWindow::layerNearestFilter(int horz_coord, int vert_coord) {
-    int x_coord = (horz_coord / texel.width()) * texel.width() + texel.width() / 2;
-    int y_coord = (vert_coord / texel.height()) * texel.height() + texel.height() / 2;
+QRgb MainWindow::layerNearestFilter(qreal horz_coord, qreal vert_coord) {
+    //int x_coord = (horz_coord / texel.width()) * texel.width() + texel.width() / 2;
+    //int y_coord = (vert_coord / texel.height()) * texel.height() + texel.height() / 2;
+    int x_coord = qRound(horz_coord);
+    int y_coord = qRound(vert_coord);
     if (pixelSafe(x_coord, y_coord, baseTexture.width(), baseTexture.height())) {
         return baseTexture.pixel(x_coord, y_coord);
     }
    return 0;//QRgb(0, 0, 0); // is it ok? <- mirroring
 }
 
-QRgb MainWindow::layerNearestFilter(QPoint pnt) {
-    return layerNearestFilter(pnt.x(), pnt.y());
+QRgb MainWindow::layerNearestFilter(QVector<qreal> coordinates) {
+    return layerNearestFilter(coordinates.first(), coordinates.last());
 }
 
 QRgb MainWindow::layerLinearFilter(int horz_coord, int vert_coord) {
-    QPoint A_texel = QPoint((horz_coord ) * (texel.width() * 4), (vert_coord ) * (texel.height() * 4));
+    //get 4 texels
+
+    //QPoint A_texel = QPoint((horz_coord / (texel.width() * 2)) * (texel.width() * 2), (vert_coord / (texel.height() * 2)) * (texel.height() * 2));
+    QPoint A_texel = QPoint(horz_coord - horz_coord % (texel.width() * 2), vert_coord - vert_coord % (texel.height() * 2));
     QPoint B_texel = QPoint(A_texel.x() + texel.width(), A_texel.y());
     QPoint C_texel = QPoint(A_texel.x(), A_texel.y() + texel.height());
     QPoint D_texel = QPoint(A_texel.x() + texel.width(), A_texel.y() + texel.height());
-    int a_distance = horz_coord % (texel.width() * 4) - (A_texel.x() + texel.width() / 2);
-    int b_distance = vert_coord % (texel.height() * 4) - (A_texel.y() + texel.height() / 2);
-    QRgb M_color = (1.0 - a_distance / static_cast<double>(texel.width())) * baseTexture.pixel(A_texel.x() + texel.width() / 2, A_texel.y() + texel.height() / 2) +
-            (a_distance / static_cast<double>(texel.width())) * baseTexture.pixel(B_texel.x() + texel.width() / 2, B_texel.y() + texel.height() / 2);
-    QRgb N_color = (1.0 - a_distance / static_cast<double>(texel.width())) * baseTexture.pixel(C_texel.x() + texel.width() / 2, C_texel.y() + texel.height() / 2) +
-            (a_distance / static_cast<double>(texel.width())) * baseTexture.pixel(D_texel.x() + texel.width() / 2, D_texel.y() + texel.height() / 2);
-    return (1.0 - b_distance / static_cast<double>(texel.height())) * M_color + b_distance / static_cast<double>(texel.height()) * N_color;
+    double a_distance = qAbs(horz_coord % (texel.width() * 2) - (A_texel.x() + texel.width() / 2)) / static_cast<double>(texel.width());
+    double b_distance = qAbs(vert_coord % (texel.height() * 2) - (A_texel.y() + texel.height() / 2)) / static_cast<double>(texel.width());
+    QRgb M_color = (1.0 - a_distance) * baseTexture.pixel(A_texel.x() + texel.width() / 2, A_texel.y() + texel.height() / 2) +
+            (a_distance) * baseTexture.pixel(B_texel.x() + texel.width() / 2, B_texel.y() + texel.height() / 2);
+    QRgb N_color = (1.0 - a_distance) * baseTexture.pixel(C_texel.x() + texel.width() / 2, C_texel.y() + texel.height() / 2) +
+            (a_distance) * baseTexture.pixel(D_texel.x() + texel.width() / 2, D_texel.y() + texel.height() / 2);
+    return (1.0 - b_distance) * M_color + b_distance * N_color;
 
 
     return baseTexture.pixel(horz_coord / texel.width() + texel.width() / 2, vert_coord / texel.height() + texel.height() / 2);
+}
+
+QRgb MainWindow::layerLinearFilter(QPoint pnt) {
+    return layerLinearFilter(pnt.x(), pnt.y());
 }
 
 QVector<qreal> MainWindow::gausSolver(QVector<QVector<qreal> > slae) {
@@ -298,8 +346,79 @@ QVector<QVector<qreal> > MainWindow::fillTopMatrix(int x1_star, int x2_star) {
     return slae;
 }
 
+QVector<QVector<qreal> > MainWindow::fillBottomMatrix(int x1_star, int x2_star) {
+
+    QVector<QVector<qreal> > slae;
+    QVector<qreal> rowMatrix = QVector<qreal>(9, 0.0);
+    rowMatrix.replace(0, static_cast<qreal>(x1_star));
+    rowMatrix.replace(1, 128.0);
+    rowMatrix.replace(2, 1.0);
+    slae.append(rowMatrix);
+
+    rowMatrix = QVector<qreal>(9, 0.0);
+    rowMatrix.replace(3, 2 * static_cast<qreal>(x1_star));
+    rowMatrix.replace(4, 256.0);
+    rowMatrix.replace(5, 2.0);
+    rowMatrix.replace(6, -static_cast<qreal>(x1_star));
+    rowMatrix.replace(7, -128.0);
+    rowMatrix.replace(8, 1.0);
+    slae.append(rowMatrix);
+
+    rowMatrix = QVector<qreal>(9, 0.0);
+    rowMatrix.replace(0, static_cast<qreal>(x2_star));
+    rowMatrix.replace(1, 128.0);
+    rowMatrix.replace(2, 1.0);
+    rowMatrix.replace(6, -static_cast<qreal>(x2_star));
+    rowMatrix.replace(7, -128.0);
+    rowMatrix.replace(8, 1.0);
+    slae.append(rowMatrix);
+
+    rowMatrix = QVector<qreal>(9, 0.0);
+    rowMatrix.replace(3, 2 * static_cast<qreal>(x2_star));
+    rowMatrix.replace(4, 256.0);
+    rowMatrix.replace(5, 2.0);
+    rowMatrix.replace(6, -static_cast<qreal>(x2_star));
+    rowMatrix.replace(7, -128.0);
+    rowMatrix.replace(8, 1.0);
+    slae.append(rowMatrix);
+
+    rowMatrix = QVector<qreal>(9, 0.0);
+    rowMatrix.replace(1, 256.0);
+    rowMatrix.replace(2, 1.0);
+    slae.append(rowMatrix);
+
+    rowMatrix = QVector<qreal>(9, 0.0);
+    rowMatrix.replace(4, 256.0);
+    rowMatrix.replace(5, 1.0);
+    rowMatrix.replace(7, -256.0);
+    rowMatrix.replace(8, 1.0);
+    slae.append(rowMatrix);
+
+    rowMatrix = QVector<qreal>(9, 0.0);
+    rowMatrix.replace(0, 256.0);
+    rowMatrix.replace(1, 256.0);
+    rowMatrix.replace(2, 1.0);
+    rowMatrix.replace(6, -256.0);
+    rowMatrix.replace(7, -256.0);
+    rowMatrix.replace(8, 1.0);
+    slae.append(rowMatrix);
+
+    rowMatrix = QVector<qreal>(9, 0.0);
+    rowMatrix.replace(3, 256.0);
+    rowMatrix.replace(4, 256.0);
+    rowMatrix.replace(5, 1.0);
+    rowMatrix.replace(6, -256.0);
+    rowMatrix.replace(7, -256.0);
+    rowMatrix.replace(8, 1.0);
+    slae.append(rowMatrix);
+    return slae;
+}
 QVector<QVector<qreal> > MainWindow::fillTopMatrix(QPoint f_pnt, QPoint c_pnt) {
     return fillTopMatrix(f_pnt.x(), c_pnt.x());
+}
+
+QVector<QVector<qreal> > MainWindow::fillBottomMatrix(QPoint f_pnt, QPoint c_pnt) {
+    return fillBottomMatrix(f_pnt.x(), c_pnt.x());
 }
 
 QPoint MainWindow::relativeCoordinates(QPoint pnt) {
@@ -332,7 +451,7 @@ void MainWindow::drawBorders() {
     drawLine(toSceneCoordinates(f_point_current), toSceneCoordinates(a_point), QColor(0, 0, 0).rgba());
 }
 
-QPoint MainWindow::getTexturePoint(QPoint pnt, QVector<qreal> coeffs) {
+QVector<qreal> MainWindow::getTexturePoint(QPoint pnt, QVector<qreal> coeffs) {
     qreal u_component = (pnt.x() * coeffs[0] + pnt.y() * coeffs[1] + coeffs[2]) / (pnt.x() * coeffs[6] + pnt.y() * coeffs[7] + 1);
     qreal v_component = (pnt.x() * coeffs[3] + pnt.y() * coeffs[4] + coeffs[5]) / (pnt.x() * coeffs[6] + pnt.y() * coeffs[7] + 1);
     if (1.0 < u_component) {
@@ -347,7 +466,10 @@ QPoint MainWindow::getTexturePoint(QPoint pnt, QVector<qreal> coeffs) {
     if (0.0 > v_component) {
         v_component += 1.0;
     }
-    return QPoint(static_cast<int>(u_component * baseTexture.width() - 0.5), static_cast<int>(v_component * baseTexture.height() - 0.5));
+    QVector<qreal> coordinates;
+    coordinates.append(u_component * baseTexture.width());
+    coordinates.append(v_component * baseTexture.height());
+    return coordinates;
 }
 
 QPoint MainWindow::toSceneCoordinates(QPoint pnt) {

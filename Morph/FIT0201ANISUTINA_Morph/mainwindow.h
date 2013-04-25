@@ -27,11 +27,14 @@ public:
     void drawLine(QPoint, QPoint, QRgb);
     void drawHLine(QPoint, QPoint, QRgb);
     void drawVLine(QPoint, QPoint, QRgb);
-    void renderingTexturedImage(QVector<qreal> topCoeffs);//, QVector<qreal> bottomCoeffs);
-    QRgb layerNearestFilter(int, int);
-    QRgb layerNearestFilter(QPoint);
+    void renderingTexturedImage(QVector<qreal> topCoeffs, QVector<qreal> bottomCoeffs);
+    //QRgb layerNearestFilter(int, int);
+    QRgb layerNearestFilter(qreal, qreal);
+    //QRgb layerNearestFilter(QPoint);
+    QRgb layerNearestFilter(QVector<qreal>);
     QRgb layerLinearFilter(int, int);
-    //void gausSolver(QVector<QVector<qreal> > slae);
+    QRgb layerLinearFilter(QPoint);
+    //void gausSolver();
     QVector<qreal> gausSolver(QVector<QVector<qreal> > slae);
     QVector<QVector<qreal> > fillTopMatrix(int x1_star, int x2_star);
     QVector<QVector<qreal> > fillTopMatrix(QPoint f_pnt, QPoint c_pnt);
@@ -40,7 +43,8 @@ public:
     QPoint relativeCoordinates(QPoint pnt);
     void initializePoints();
     void drawBorders();
-    QPoint getTexturePoint(QPoint pnt, QVector<qreal> coeffs);
+    //QPoint getTexturePoint(QPoint pnt, QVector<qreal> coeffs);
+    QVector<qreal> getTexturePoint(QPoint pnt, QVector<qreal> coeffs);
     QPoint toSceneCoordinates(QPoint);
     QVector<QPoint> getPointsOfBrezenhemLine(QPoint start_line, QPoint end_line, QVector<QPoint> line);
 
