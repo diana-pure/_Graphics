@@ -18,45 +18,44 @@ public:
     ~MainWindow();
     void paintEvent(QPaintEvent *);
     void resizeEvent(QResizeEvent *);
-    void clearScene();
     void setPoint(QPoint);
     void setPixelSafe(int, int, QRgb);
     void setPixelSafe(QPoint, QRgb);
     bool pixelSafe(int x_coord, int y_coord, int image_width, int image_height);
     void redrawScene();
+    void constructMipLevels();
     void drawLine(QPoint, QPoint, QRgb);
     void drawHLine(QPoint, QPoint, QRgb);
     void drawVLine(QPoint, QPoint, QRgb);
-    void renderingTexturedImage();//QVector<qreal> topCoeffs, QVector<qreal> bottomCoeffs);
-    //QRgb layerNearestFilter(int, int);
+    void renderingTexturedImage();
     QRgb layerNearestFilter(qreal, qreal);
-    //QRgb layerNearestFilter(QPoint);
     QRgb layerNearestFilter(QVector<qreal>);
     QRgb layerLinearFilter(qreal, qreal);
     QRgb layerLinearFilter(QVector<qreal>);
-    //void gausSolver();
+    QRgb mipNoneFilter(QVector<QVector<qreal> >);
+    void renderLayerNearestFilteredImage();
+    void renderLayerLinearFilteredImage();
+    void renderMipNoneFilteredImage();
     QVector<qreal> gausSolver(QVector<QVector<qreal> > slae);
     QVector<QVector<qreal> > fillTopMatrix(int x1_star, int x2_star);
     QVector<QVector<qreal> > fillTopMatrix(QPoint f_pnt, QPoint c_pnt);
     QVector<QVector<qreal> > fillBottomMatrix(int x1_star, int x2_star);
     QVector<QVector<qreal> > fillBottomMatrix(QPoint f_pnt, QPoint c_pnt);
     QPoint relativeCoordinates(QPoint pnt);
+    QPoint toSceneCoordinates(QPoint);
     void initializePoints();
     void drawBorders();
-    //QPoint getTexturePoint(QPoint pnt, QVector<qreal> coeffs);
     QVector<qreal> getTexturePoint(QPoint pnt, QVector<qreal> coeffs);
-    QPoint toSceneCoordinates(QPoint);
     QVector<QPoint> getPointsOfBrezenhemLine(QPoint start_line, QPoint end_line, QVector<QPoint> line);
-    void renderLayerNearestFilteredImage();//QVector<qreal> topCffs, QVector<qreal> btmCffs);
-    void renderLayerLinearFilteredImage();//QVector<qreal>, QVector<qreal>);
+
+
 
 private slots:
     void on_fPointSlider_sliderMoved(int position);
     void on_cPointSlider_sliderMoved(int position);
-
     void on_nearestLayerBtn_clicked();
-
     void on_linearLayerBtn_clicked();
+    void on_noneMipBtn_clicked();
 
 private:
     Ui::MainWindow *ui;
@@ -73,8 +72,7 @@ private:
     QSize texel;
     QVector<qreal> coefficientsForTopTransform;
     QVector<qreal> coefficientsForBottomTransform;
-    //QVector<qreal> coeffTransform;
-    //QVector<QVector<qreal> > slae;
+    QVector<QImage> mipLevels;
 };
 
 #endif // MAINWINDOW_H
